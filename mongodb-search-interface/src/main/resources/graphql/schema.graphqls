@@ -1,0 +1,54 @@
+scalar Long
+
+enum SearchOperatorType {
+    EQUAL
+    CONTAIN
+    BETWEEN
+}
+
+enum AggregateOperatorType {
+    COUNT
+    SUM
+    AVERAGE
+}
+
+enum PropertyType {
+    INTEGER
+    LONG
+    DOUBLE
+    FLOAT
+    BOOLEAN
+    DATE
+    STRING
+}
+
+input SortInput {
+    property: String,
+    isDescending: Boolean
+}
+
+input SearchInput {
+    by: String
+    type: PropertyType!
+    operator: SearchOperatorType!
+    value: [String]
+}
+
+input PageInput {
+    pageNumber: Long
+    pageSize: Long
+    sort: [SortInput]
+    search: [SearchInput]!
+}
+
+input AggregateInput {
+    property: String!
+    type: PropertyType!
+    operator: AggregateOperatorType!
+}
+
+input StatisticInput {
+    groupBy: [String]!
+    aggregates: [AggregateInput]!
+}
+
