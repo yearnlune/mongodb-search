@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.7.0"
     id("org.jetbrains.dokka") version "1.6.20"
-    jacoco
 }
 
 allprojects {
@@ -30,15 +29,4 @@ val dokkaJavadocJar by tasks.register<Jar>("dokkaJavadocJar") {
     dependsOn(tasks.dokkaJavadoc)
     from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
     archiveClassifier.set("javadoc")
-}
-
-tasks {
-    test {
-        useJUnitPlatform()
-
-        finalizedBy(jacocoTestReport)
-    }
-    java {
-        withSourcesJar()
-    }
 }

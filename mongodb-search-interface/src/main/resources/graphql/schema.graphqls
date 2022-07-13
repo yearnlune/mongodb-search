@@ -20,6 +20,7 @@ enum PropertyType {
     BOOLEAN
     DATE
     STRING
+    OBJECT_ID
 }
 
 input SortInput {
@@ -42,13 +43,13 @@ input PageInput {
 }
 
 input AggregateInput {
-    property: String!
-    type: PropertyType!
+    property: String
+    type: PropertyType
     operator: AggregateOperatorType!
 }
 
 input StatisticInput {
     groupBy: [String]!
-    aggregates: [AggregateInput]!
+    aggregates: [AggregateInput!]!
 }
 
