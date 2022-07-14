@@ -13,20 +13,21 @@ fun String.snakeCase(): String {
     }.lowercase()
 }
 
-fun <T> Class<T>.getFieldPath(fieldName: String): String {
+fun <T> Class<T>.getFieldPath(fieldName: String, snakeCase: Boolean = false): String {
+    val name = if (snakeCase) fieldName.snakeCase() else fieldName
     val fields = this.getAllFields()
         .filter { !it.isSynthetic }
-        .associateBy { it.name.snakeCase() }
+        .associateBy { if (snakeCase) it.name.snakeCase() else it.name }
 
-    return if (fields.containsKey(fieldName)) fieldName else throw NotFoundFieldException("Not found field: '$fieldName' at [${this.javaClass.simpleName}]")
+    return if (fields.containsKey(name)) name else throw NotFoundFieldException("Not found field: '$name' at [${this.javaClass.simpleName}]")
 }
 
 fun <T> Class<T>.getAllFields(): MutableList<Field> {
     val fields: MutableList<Field> = this.declaredFields.toMutableList()
 
     if (this.superclass != null) {
-        val list = this.superclass.getAllFields()
-        fields.addAll(list)
+        val superClassFields = this.superclass.getAllFields()
+        fields.addAll(superClassFields)
     }
 
     return fields
@@ -52,6 +53,5 @@ fun String.toMongoType(type: PropertyType): Any {
 
 fun Long.toObjectId(): ObjectId = ObjectId(floor((this / 1000).toDouble()).toLong().toString(16) + "0000000000000000")
 
-fun String.escapeSpecialRegexChars(): String {
-    return Pattern.compile("[{}()\\[\\].,+*?^$#\\\\|-]").matcher(this).replaceAll("\\\\$0")
-}
+fun String.escapeSpecialRegexChars(): String =
+    Pattern.compile("[{}()\\[\\].,+*?^$#\\\\|-]").matcher(this).replaceAll("\\\\$0")

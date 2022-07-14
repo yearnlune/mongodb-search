@@ -44,7 +44,6 @@ input PageInput {
 
 input AggregateInput {
     property: String
-    type: PropertyType
     operator: AggregateOperatorType!
 }
 
