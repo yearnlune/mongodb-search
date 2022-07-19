@@ -7,5 +7,16 @@ abstract class SearchOperator(
     open val values: List<Any>
 ) : Operator {
 
-    abstract fun buildQuery(): Criteria
+    override fun validate(): Boolean = true
+
+    abstract fun appendExpression(criteria: Criteria): Criteria
+
+    fun buildQuery(criteria: Criteria? = null): Criteria {
+        val searchCriteria = initializeCriteriaWithTarget(criteria)
+        return appendExpression(searchCriteria)
+    }
+
+    private fun initializeCriteriaWithTarget(criteria: Criteria? = null): Criteria {
+        return criteria?.and(searchBy) ?: Criteria.where(searchBy)
+    }
 }

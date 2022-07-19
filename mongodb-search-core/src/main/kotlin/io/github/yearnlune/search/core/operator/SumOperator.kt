@@ -4,22 +4,20 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.GroupOperation
 
 class SumOperator(
-    private val property: String
+    private val propertyPath: String,
+    alias: String? = null
 ) : AggregateOperator() {
+
+    override val finalAlias: String by lazy { alias ?: "${propertyPath}_sum" }
+
+    override fun validate(): Boolean {
+        return propertyPath.isNotBlank()
+    }
 
     override fun buildOperation(aggregationOperation: AggregationOperation?): AggregationOperation {
         return when (aggregationOperation) {
-            is GroupOperation -> {
-                if (property.isBlank()) {
-                    throw java.lang.IllegalArgumentException()
-                }
-
-                aggregationOperation.sum(property).`as`("${property}_sum")
-            }
-            else -> {
-                throw IllegalArgumentException()
-            }
+            is GroupOperation -> aggregationOperation.sum(propertyPath).`as`(finalAlias)
+            else -> throw IllegalArgumentException()
         }
     }
-
 }

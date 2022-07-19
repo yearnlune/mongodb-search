@@ -1,0 +1,15 @@
+name: build
+on: [push, pull_request]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup JDK
+        uses: actions/setup-java@v3.3.0
+        with:
+          java-version: 11
+          distribution: corretto
+      - name: Grant permission and build
+        run: chmod +x ./gradlew && ./gradlew build

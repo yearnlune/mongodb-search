@@ -10,11 +10,14 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.MatchOperation
 import org.springframework.data.mongodb.core.query.Criteria
 
-object SearchOperatorDelegator {
+class SearchOperatorDelegator {
 
     private lateinit var searchOperator: SearchOperator
 
-    fun <T> create(searchInput: SearchInput, targetClass: Class<T>): SearchOperatorDelegator {
+    fun <T> create(
+        searchInput: SearchInput,
+        targetClass: Class<T>,
+    ): SearchOperatorDelegator {
         val searchBy = targetClass.getFieldPath(searchInput.by, true)
         val typedValues = searchInput.value.map { value -> value.toMongoType(searchInput.type) }
 
@@ -28,9 +31,9 @@ object SearchOperatorDelegator {
         return this
     }
 
-    fun buildQuery(): Criteria = searchOperator.buildQuery()
-
-    fun buildMatchOperation(): AggregationOperation = MatchOperation(searchOperator.buildQuery())
+    fun buildQuery(criteria: Criteria? = null): Criteria = searchOperator.buildQuery(criteria)
 
     fun buildAggregation(): Aggregation = Aggregation.newAggregation(buildMatchOperation())
+
+    private fun buildMatchOperation(): AggregationOperation = MatchOperation(searchOperator.buildQuery())
 }

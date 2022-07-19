@@ -3,9 +3,9 @@ package io.github.yearnlune.search.core.operator
 import org.springframework.data.mongodb.core.query.Criteria
 
 class EqualOperator(
-    override val searchBy: String,
-    override val values: List<Any>
+    searchBy: String,
+    values: List<Any>
 ) : SearchOperator(searchBy, values) {
 
-    override fun buildQuery(): Criteria = Criteria.where(searchBy).`in`(values)
+    override fun appendExpression(criteria: Criteria): Criteria = criteria.`in`(values)
 }

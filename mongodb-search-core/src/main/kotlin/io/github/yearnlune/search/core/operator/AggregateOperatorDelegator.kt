@@ -1,37 +1,59 @@
 package io.github.yearnlune.search.core.operator
 
+import io.github.yearnlune.search.core.exception.NotSupportedExpressionException
 import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
+import io.github.yearnlune.search.core.exception.ValidationException
 import io.github.yearnlune.search.core.extension.getFieldPath
 import io.github.yearnlune.search.graphql.AggregateOperatorType
-import io.github.yearnlune.search.graphql.StatisticInput
+import io.github.yearnlune.search.graphql.AggregationInput
+import io.github.yearnlune.search.graphql.CountAggregationInput
+import io.github.yearnlune.search.graphql.GroupAggregationInput
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 
-object AggregateOperatorDelegator {
+class AggregateOperatorDelegator {
 
-    private var aggregateOperator: AggregateOperator? = null
+    private lateinit var aggregateOperator: AggregateOperator
 
-    private var groupOperator: GroupOperator? = null
-
-    fun <T> create(statisticInput: StatisticInput, targetClass: Class<T>): AggregateOperatorDelegator {
-        val groupBy = statisticInput.groupBy.map { targetClass.getFieldPath(it, true) }
-        groupOperator = if (groupBy.isNotEmpty()) GroupOperator(groupBy) else null
-
-        statisticInput.aggregates.forEach {
-            val target = if (it.property != null) targetClass.getFieldPath(it.property, true) else ""
-            aggregateOperator = when (it.operator) {
-                AggregateOperatorType.COUNT -> CountOperator()
-                AggregateOperatorType.SUM -> SumOperator(target)
-                else -> throw NotSupportedOperatorException("Not supported operator: ${it.operator.name}")
+    fun create(aggregationInput: Any, targetClass: Class<*>): AggregateOperatorDelegator {
+        when (aggregationInput) {
+            is GroupAggregationInput -> {
+                val groupBy = aggregationInput.by.map { targetClass.getFieldPath(it, true) }
+                aggregateOperator = GroupOperator(groupBy)
+                buildExpression(aggregationInput.aggregations, targetClass)
             }
-
-            if (groupBy.isNotEmpty()) {
-                aggregateOperator?.buildOperation(groupOperator!!.groupOperation)
+            is CountAggregationInput -> {
+                aggregateOperator = CountOperator(aggregationInput.alias)
+            }
+            else -> {
+                throw NotSupportedOperatorException("Not supported operator: ${aggregationInput::class.simpleName}")
             }
         }
 
         return this
     }
 
-    fun buildAggregate(): AggregationOperation = aggregateOperator?.buildOperation(groupOperator?.groupOperation)
-        ?: throw NotSupportedOperatorException("Not supported operator")
+    fun buildAggregate(aggregationOperation: AggregationOperation? = null): AggregationOperation {
+        return if (aggregateOperator.validate()) {
+            aggregateOperator.buildOperation(aggregationOperation)
+        } else {
+            throw ValidationException("Validation failed")
+        }
+    }
+
+    private fun buildExpression(aggregations: List<AggregationInput>, targetClass: Class<*>) {
+        aggregations.forEach {
+            try {
+                val expression = when (it.operator) {
+                    AggregateOperatorType.COUNT -> CountOperator(it.alias)
+                    AggregateOperatorType.SUM -> SumOperator(targetClass.getFieldPath(it.property, true))
+                    AggregateOperatorType.AVERAGE -> AverageOperator(targetClass.getFieldPath(it.property, true))
+                    else -> throw NotSupportedExpressionException("Not supported expression: ${it.operator.name}")
+                }
+
+                aggregateOperator.operation = expression.buildOperation(aggregateOperator.operation)
+            } catch (e: NullPointerException) {
+                throw IllegalArgumentException()
+            }
+        }
+    }
 }

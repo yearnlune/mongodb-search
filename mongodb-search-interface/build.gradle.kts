@@ -21,6 +21,9 @@ tasks {
     test {
         useJUnitPlatform()
     }
+    generatePojo {
+        dependsOn("clean")
+    }
 }
 
 generatePojoConf {
@@ -35,6 +38,25 @@ generatePojoConf {
             "java.lang.Long",
             null,
             "graphql.scalars.ExtendedScalars.GraphQLLong",
+            null
+        )
+    )
+    customScalars.push(
+        com.graphql_java_generator.plugin.conf.CustomScalarDefinition(
+            "JSON",
+            "java.lang.Object",
+            "graphql.scalars.object.JsonScalar",
+            "graphql.scalars.ExtendedScalars.Json",
+            null
+        )
+    )
+
+    customScalars.push(
+        com.graphql_java_generator.plugin.conf.CustomScalarDefinition(
+            "Aggregation",
+            "java.lang.Object",
+            null,
+            "io.github.yearnlune.search.interface.AggregationScalar.INSTANCE",
             null
         )
     )

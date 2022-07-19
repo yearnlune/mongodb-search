@@ -1,4 +1,5 @@
 scalar Long
+scalar JSON
 
 enum SearchOperatorType {
     EQUAL
@@ -39,16 +40,25 @@ input PageInput {
     pageNumber: Long
     pageSize: Long
     sort: [SortInput]
-    search: [SearchInput]!
+    search: [SearchInput]! = []
 }
 
-input AggregateInput {
+input AggregationInput {
     property: String
     operator: AggregateOperatorType!
+    alias: String
+}
+
+input GroupAggregationInput {
+    by: [String]! = []
+    aggregations: [AggregationInput!]!
+}
+
+input CountAggregationInput {
+    alias: String
 }
 
 input StatisticInput {
-    groupBy: [String]!
-    aggregates: [AggregateInput!]!
+    searches: [SearchInput]! = [],
+    aggregates: [JSON]! = []
 }
-
