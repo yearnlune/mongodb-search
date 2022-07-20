@@ -27,8 +27,8 @@ tasks {
     generatePojo {
         dependsOn("clean")
     }
-    java {
-        withSourcesJar()
+    dokkaJavadoc {
+        dependsOn("generatePojo")
     }
 }
 
