@@ -24,6 +24,15 @@ enum PropertyType {
     OBJECT_ID
 }
 
+enum ChartType {
+    HORIZONTAL_BAR
+    VERTICAL_BAR
+    COUNT
+    PIE
+    DOUGHNUT
+    LINE
+}
+
 input SortInput {
     property: String,
     isDescending: Boolean
@@ -61,4 +70,8 @@ input CountAggregationInput {
 input StatisticInput {
     searches: [SearchInput]! = [],
     aggregates: [JSON]! = []
+}
+
+input ChartInput {
+    type: String
 }
