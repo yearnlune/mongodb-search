@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.backend.common.push
 plugins {
     kotlin("jvm")
 
-    id("org.jetbrains.dokka") version "1.6.20"
     id("com.graphql_java_generator.graphql-gradle-plugin") version "1.18.6"
     `maven-publish`
     signing
@@ -74,17 +73,10 @@ sourceSets {
     }
 }
 
-val dokkaJavadocJar by tasks.register<Jar>("dokkaJavadocJar") {
-    dependsOn(tasks.dokkaJavadoc)
-    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
-    archiveClassifier.set("javadoc")
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifact(dokkaJavadocJar)
 
             pom {
                 name.set(project.name)
