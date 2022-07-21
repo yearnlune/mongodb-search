@@ -30,6 +30,9 @@ tasks {
     dokkaJavadoc {
         dependsOn("generatePojo")
     }
+    java {
+        withSourcesJar()
+    }
 }
 
 generatePojoConf {
