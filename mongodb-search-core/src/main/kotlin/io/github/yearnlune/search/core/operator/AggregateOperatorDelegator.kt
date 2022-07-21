@@ -2,8 +2,7 @@ package io.github.yearnlune.search.core.operator
 
 import io.github.yearnlune.search.core.exception.NotSupportedExpressionException
 import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
-import io.github.yearnlune.search.core.exception.ValidationException
-import io.github.yearnlune.search.core.extension.getFieldPath
+import io.github.yearnlune.search.core.extension.snakeCase
 import io.github.yearnlune.search.graphql.AggregateOperatorType
 import io.github.yearnlune.search.graphql.AggregationInput
 import io.github.yearnlune.search.graphql.CountAggregationInput
@@ -17,7 +16,7 @@ class AggregateOperatorDelegator {
     fun create(aggregationInput: Any, targetClass: Class<*>): AggregateOperatorDelegator {
         when (aggregationInput) {
             is GroupAggregationInput -> {
-                val groupBy = aggregationInput.by.map { targetClass.getFieldPath(it, true) }
+                val groupBy = aggregationInput.by.map { it.snakeCase() }
                 aggregateOperator = GroupOperator(groupBy)
                 buildExpression(aggregationInput.aggregations, targetClass)
             }
@@ -33,11 +32,7 @@ class AggregateOperatorDelegator {
     }
 
     fun buildAggregate(aggregationOperation: AggregationOperation? = null): AggregationOperation {
-        return if (aggregateOperator.validate()) {
-            aggregateOperator.buildOperation(aggregationOperation)
-        } else {
-            throw ValidationException("Validation failed")
-        }
+        return aggregateOperator.buildQuery(aggregationOperation)
     }
 
     private fun buildExpression(aggregations: List<AggregationInput>, targetClass: Class<*>) {
@@ -45,12 +40,12 @@ class AggregateOperatorDelegator {
             try {
                 val expression = when (it.operator) {
                     AggregateOperatorType.COUNT -> CountOperator(it.alias)
-                    AggregateOperatorType.SUM -> SumOperator(targetClass.getFieldPath(it.property, true))
-                    AggregateOperatorType.AVERAGE -> AverageOperator(targetClass.getFieldPath(it.property, true))
+                    AggregateOperatorType.SUM -> SumOperator(it.property.snakeCase())
+                    AggregateOperatorType.AVERAGE -> AverageOperator(it.property.snakeCase())
                     else -> throw NotSupportedExpressionException("Not supported expression: ${it.operator.name}")
                 }
 
-                aggregateOperator.operation = expression.buildOperation(aggregateOperator.operation)
+                aggregateOperator.operation = expression.buildQuery(aggregateOperator.operation)
             } catch (e: NullPointerException) {
                 throw IllegalArgumentException()
             }

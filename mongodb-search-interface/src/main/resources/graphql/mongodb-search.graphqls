@@ -49,7 +49,7 @@ input PageInput {
     pageNumber: Long
     pageSize: Long
     sort: [SortInput]
-    search: [SearchInput]! = []
+    searches: [SearchInput]! = []
 }
 
 input AggregationInput {

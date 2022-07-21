@@ -16,14 +16,13 @@ fun String.snakeCase(): String {
 fun <T> Class<T>.getFieldPath(fieldName: String, snakeCase: Boolean = false): String {
     val name = if (snakeCase) fieldName.snakeCase() else fieldName
     val fields = this.getAllFields()
-        .filter { !it.isSynthetic }
         .associateBy { if (snakeCase) it.name.snakeCase() else it.name }
 
-    return if (fields.containsKey(name)) name else throw NotFoundFieldException("Not found field: '$name' at [${this.javaClass.simpleName}]")
+    return if (fields.containsKey(name)) name else throw NotFoundFieldException("Not found field: '$name' at [${this.simpleName}]")
 }
 
 fun <T> Class<T>.getAllFields(): MutableList<Field> {
-    val fields: MutableList<Field> = this.declaredFields.toMutableList()
+    val fields: MutableList<Field> = this.declaredFields.toMutableList().filter { !it.isSynthetic }.toMutableList()
 
     if (this.superclass != null) {
         val superClassFields = this.superclass.getAllFields()

@@ -1,10 +1,9 @@
 package io.github.yearnlune.search.core.extension
 
-import io.github.yearnlune.search.core.exception.NotFoundFieldException
-import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
 import io.github.yearnlune.search.core.MongoSearch
 import io.github.yearnlune.search.core.domain.Product
 import io.github.yearnlune.search.core.exception.ValidationException
+import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
 import io.github.yearnlune.search.graphql.*
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
@@ -185,7 +184,7 @@ class QueryExtensionTest : DescribeSpec({
                         }
 
                         context("필드가 빈 값 일 때") {
-                            it("NotFoundFieldException을 반환한다.") {
+                            it("ValidationException을 반환한다.") {
                                 val aggregates = SearchOperatorDelegator()
                                     .create(searchInput, Product::class.java)
                                     .buildAggregation()
@@ -202,7 +201,7 @@ class QueryExtensionTest : DescribeSpec({
                                     )
                                     .build()
 
-                                shouldThrow<NotFoundFieldException> {
+                                shouldThrow<ValidationException> {
                                     aggregates.aggregate(
                                         listOf(groupAggregation),
                                         Product::class.java

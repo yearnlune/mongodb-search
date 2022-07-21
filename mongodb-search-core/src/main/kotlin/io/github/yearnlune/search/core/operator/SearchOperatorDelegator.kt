@@ -1,7 +1,7 @@
 package io.github.yearnlune.search.core.operator
 
 import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
-import io.github.yearnlune.search.core.extension.getFieldPath
+import io.github.yearnlune.search.core.extension.snakeCase
 import io.github.yearnlune.search.core.extension.toMongoType
 import io.github.yearnlune.search.graphql.SearchInput
 import io.github.yearnlune.search.graphql.SearchOperatorType
@@ -18,7 +18,7 @@ class SearchOperatorDelegator {
         searchInput: SearchInput,
         targetClass: Class<T>,
     ): SearchOperatorDelegator {
-        val searchBy = targetClass.getFieldPath(searchInput.by, true)
+        val searchBy = searchInput.by.snakeCase()
         val typedValues = searchInput.value.map { value -> value.toMongoType(searchInput.type) }
 
         searchOperator = when (searchInput.operator) {
