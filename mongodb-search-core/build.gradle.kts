@@ -8,7 +8,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":mongodb-search-interface"))
+    implementation(project(":mongodb-search-interface"))
     api("org.springframework.data:spring-data-mongodb:3.4.0")
 
     testImplementation("com.fasterxml.jackson.core:jackson-databind:2.13.3")
