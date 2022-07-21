@@ -24,8 +24,6 @@ allprojects {
 dependencies {
     api(project(":mongodb-search-interface"))
     api(project(":mongodb-search-core"))
-
-    testImplementation(kotlin("test"))
 }
 
 publishing {

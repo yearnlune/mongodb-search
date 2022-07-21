@@ -27,9 +27,6 @@ tasks {
     generatePojo {
         dependsOn("clean")
     }
-    dokkaJavadoc {
-        dependsOn("generatePojo")
-    }
 }
 
 generatePojoConf {
