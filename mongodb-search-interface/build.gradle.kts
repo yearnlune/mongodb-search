@@ -30,9 +30,6 @@ tasks {
     dokkaJavadoc {
         dependsOn("generatePojo")
     }
-    java {
-        withSourcesJar()
-    }
 }
 
 generatePojoConf {
@@ -83,11 +80,19 @@ val dokkaJavadocJar by tasks.register<Jar>("dokkaJavadocJar") {
     archiveClassifier.set("javadoc")
 }
 
+val sourcesJar by tasks.register<Jar>("sourcesJar") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn(JavaPlugin.CLASSES_TASK_NAME)
+    from(sourceSets["main"].allSource)
+    archiveClassifier.set("sources")
+}
+
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
             artifact(dokkaJavadocJar)
+            artifact(sourcesJar)
 
             pom {
                 name.set(project.name)
