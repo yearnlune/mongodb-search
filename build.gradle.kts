@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.7.0"
-    id("org.jetbrains.dokka") version "1.6.20"
+
     `maven-publish`
     signing
 }
@@ -28,17 +28,10 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-val dokkaJavadocJar by tasks.register<Jar>("dokkaJavadocJar") {
-    dependsOn(tasks.dokkaJavadoc)
-    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
-    archiveClassifier.set("javadoc")
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifact(dokkaJavadocJar)
 
             pom {
                 name.set(rootProject.name)
