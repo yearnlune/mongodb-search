@@ -33,6 +33,11 @@ enum ChartType {
     LINE
 }
 
+enum ChartValueType {
+    ORIGIN
+    PERCENTAGE
+}
+
 input SortInput {
     property: String,
     isDescending: Boolean
@@ -73,5 +78,15 @@ input StatisticInput {
 }
 
 input ChartInput {
-    type: String
+    title: String
+    description: String
+    type: ChartType
+    colorPalette: String
+    value: ChartValueType
+    dataset: ChartDatasetInput
+}
+
+input ChartDatasetInput {
+    collection: String
+    statistic: StatisticInput!
 }
