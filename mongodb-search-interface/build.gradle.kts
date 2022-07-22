@@ -28,7 +28,7 @@ tasks {
         dependsOn("clean")
     }
     dokkaJavadoc {
-        dependsOn("generatePojo")
+        mustRunAfter("generatePojo")
     }
 }
 

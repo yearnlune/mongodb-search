@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.7.0"
-
+    id("org.jetbrains.dokka") version "1.6.20"
     `maven-publish`
     signing
 }
@@ -17,15 +17,13 @@ allprojects {
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 }
 
 dependencies {
     api(project(":mongodb-search-interface"))
     api(project(":mongodb-search-core"))
-
-    testImplementation(kotlin("test"))
 }
 
 publishing {
