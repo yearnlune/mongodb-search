@@ -5,12 +5,12 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 
 class GroupOperator(
-    private val groupBy: List<String>
+    private val groupByList: List<String>
 ) : AggregateOperator() {
 
-    override var operation: AggregationOperation? = Aggregation.group(groupBy.toMongoFields())
+    override var operation: AggregationOperation? = Aggregation.group(groupByList.toMongoFields())
 
-    override fun validate(): Boolean = groupBy.isNotEmpty()
+    override fun validate(): Boolean = groupByList.isNotEmpty()
 
     override fun buildOperation(aggregationOperation: AggregationOperation?): AggregationOperation {
         return this.operation!!

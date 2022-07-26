@@ -11,17 +11,34 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 
 class AggregateOperatorDelegator {
 
-    private lateinit var aggregateOperator: AggregateOperator
+    private val aggregateOperator: MutableList<AggregateOperator> = mutableListOf()
 
     fun create(aggregationInput: Any, targetClass: Class<*>): AggregateOperatorDelegator {
         when (aggregationInput) {
             is GroupAggregationInput -> {
-                val groupBy = aggregationInput.by.map { it.snakeCase() }
-                aggregateOperator = GroupOperator(groupBy)
-                buildExpression(aggregationInput.aggregations, targetClass)
+                val addFields = mutableListOf<AddFieldsOperator.Field>()
+                val groupByList = aggregationInput.by
+                    .map { groupBy ->
+                        groupBy.key = groupBy.key.snakeCase()
+                        groupBy.option
+                            ?.let {
+                                val newFieldKey = "${groupBy.key}_${groupBy.option.ordinal}"
+                                addFields.add(AddFieldsOperator.Field(groupBy.key, groupBy.option, newFieldKey))
+                                groupBy.key = newFieldKey
+                            }
+                        groupBy.key
+                    }
+
+                if (addFields.isNotEmpty()) {
+                    aggregateOperator.add(AddFieldsOperator(addFields))
+                }
+
+                val groupOperator =
+                    buildExpression(GroupOperator(groupByList), aggregationInput.aggregations, targetClass)
+                aggregateOperator.add(groupOperator)
             }
             is CountAggregationInput -> {
-                aggregateOperator = CountOperator(aggregationInput.alias)
+                aggregateOperator.add(CountOperator(aggregationInput.alias))
             }
             else -> {
                 throw NotSupportedOperatorException("Not supported operator: ${aggregationInput::class.simpleName}")
@@ -31,11 +48,18 @@ class AggregateOperatorDelegator {
         return this
     }
 
-    fun buildAggregate(aggregationOperation: AggregationOperation? = null): AggregationOperation {
-        return aggregateOperator.buildQuery(aggregationOperation)
+    fun buildAggregate(aggregationOperation: AggregationOperation? = null): List<AggregationOperation> {
+        return aggregateOperator.map {
+            it.buildQuery(aggregationOperation)
+        }
+//        return aggregateOperator.buildQuery(aggregationOperation)
     }
 
-    private fun buildExpression(aggregations: List<AggregationInput>, targetClass: Class<*>) {
+    private fun buildExpression(
+        aggregateOperator: AggregateOperator,
+        aggregations: List<AggregationInput>,
+        targetClass: Class<*>
+    ): AggregateOperator {
         aggregations.forEach {
             try {
                 val expression = when (it.operator) {
@@ -50,5 +74,7 @@ class AggregateOperatorDelegator {
                 throw IllegalArgumentException()
             }
         }
+
+        return aggregateOperator
     }
 }

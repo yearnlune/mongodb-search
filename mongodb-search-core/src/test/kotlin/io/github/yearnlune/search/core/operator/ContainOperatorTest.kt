@@ -15,7 +15,8 @@ class ContainOperatorTest : DescribeSpec({
                 val values = listOf("apple")
 
                 val equalOperator = ContainOperator(searchBy, values).buildQuery()
-                val expectedQuery = "{ \"$searchBy\" : { \"\$regularExpression\" : { \"pattern\" : \"${values.first()}\", \"options\" : \"iu\"}}}"
+                val expectedQuery =
+                    "{ \"$searchBy\" : { \"\$regularExpression\" : { \"pattern\" : \"${values.first()}\", \"options\" : \"iu\"}}}"
 
                 SerializationUtils.serializeToJsonSafely(Query(equalOperator).queryObject) shouldBe expectedQuery
             }
@@ -26,7 +27,8 @@ class ContainOperatorTest : DescribeSpec({
                 val values = listOf("apple.3++")
 
                 val equalOperator = ContainOperator(searchBy, values).buildQuery()
-                val expectedQuery = "{ \"$searchBy\" : { \"\$regularExpression\" : { \"pattern\" : \"apple\\\\.3\\\\+\\\\+\", \"options\" : \"iu\"}}}"
+                val expectedQuery =
+                    "{ \"$searchBy\" : { \"\$regularExpression\" : { \"pattern\" : \"apple\\\\.3\\\\+\\\\+\", \"options\" : \"iu\"}}}"
 
                 SerializationUtils.serializeToJsonSafely(Query(equalOperator).queryObject) shouldBe expectedQuery
             }

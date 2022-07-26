@@ -5,6 +5,7 @@ import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
 import io.github.yearnlune.search.graphql.SearchInput
 import io.github.yearnlune.search.graphql.StatisticInput
 import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.Fields
 import org.springframework.data.mongodb.core.aggregation.MatchOperation
 import org.springframework.data.mongodb.core.query.Criteria
@@ -25,11 +26,14 @@ fun Aggregation.search(searches: List<SearchInput>, targetClass: Class<*>): Aggr
 }
 
 fun Aggregation.aggregate(aggregates: List<Any>, targetClass: Class<*>): Aggregation {
+    val operations = mutableListOf<AggregationOperation>()
+    operations.addAll(this.pipeline.operations)
+
     aggregates.forEach {
-        this.pipeline.add(AggregateOperatorDelegator().create(it, targetClass).buildAggregate())
+        operations.addAll(AggregateOperatorDelegator().create(it, targetClass).buildAggregate())
     }
 
-    return this
+    return Aggregation.newAggregation(operations)
 }
 
 fun Aggregation.statistic(statistics: StatisticInput, targetClass: Class<*>): Aggregation {

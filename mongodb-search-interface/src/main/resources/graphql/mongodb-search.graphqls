@@ -24,6 +24,13 @@ enum PropertyType {
     OBJECT_ID
 }
 
+enum GroupByOptionType {
+    DAILY
+    WEEKLY
+    MONTHLY
+    YEARLY
+}
+
 enum ChartType {
     HORIZONTAL_BAR
     VERTICAL_BAR
@@ -63,8 +70,13 @@ input AggregationInput {
     alias: String
 }
 
+input GroupByInput {
+    key: String!
+    option: GroupByOptionType
+}
+
 input GroupAggregationInput {
-    by: [String]! = []
+    by: [GroupByInput]! = []
     aggregations: [AggregationInput!]!
 }
 

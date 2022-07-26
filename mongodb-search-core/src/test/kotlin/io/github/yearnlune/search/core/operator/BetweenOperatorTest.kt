@@ -19,7 +19,8 @@ class BetweenOperatorTest : DescribeSpec({
 
         context("ObjectId 타입 필드를 범위 검색하려고 할 때") {
             it("ObjectId 타입 필드에 대한 \$gte, \$lt query를 반환한다.") {
-                val betweenOperator = BetweenOperator(searchBy, listOf(start.toObjectId(), end.toObjectId())).buildQuery()
+                val betweenOperator =
+                    BetweenOperator(searchBy, listOf(start.toObjectId(), end.toObjectId())).buildQuery()
                 val expectedQuery =
                     "{ \"$searchBy\" : { \"\$gte\" : { \"\$oid\" : \"${start.toObjectId()}\"}, \"\$lt\" : { \"\$oid\" : \"${end.toObjectId()}\"}}}"
 
@@ -38,8 +39,10 @@ class BetweenOperatorTest : DescribeSpec({
 
         context("date 타입의 업데이트 날짜를 검색하려고 할 때") {
             it("date 타입에 대한 \$gte, \$lt query를 반환한다.") {
-                val startDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(start), TimeZone.getDefault().toZoneId()).format(DateTimeFormatter.ISO_DATE_TIME)
-                val endDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(end), TimeZone.getDefault().toZoneId()).format(DateTimeFormatter.ISO_DATE_TIME)
+                val startDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(start), TimeZone.getDefault().toZoneId())
+                    .format(DateTimeFormatter.ISO_DATE_TIME)
+                val endDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(end), TimeZone.getDefault().toZoneId())
+                    .format(DateTimeFormatter.ISO_DATE_TIME)
 
                 val betweenOperator = BetweenOperator(searchBy, listOf(startDate, endDate)).buildQuery()
                 val expectedQuery = "{ \"$searchBy\" : { \"\$gte\" : \"$startDate\", \"\$lt\" : \"$endDate\"}}"

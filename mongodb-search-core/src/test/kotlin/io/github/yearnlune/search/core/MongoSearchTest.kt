@@ -86,7 +86,13 @@ class MongoSearchTest : DescribeSpec({
                     .withOperator(SearchOperatorType.BETWEEN)
                     .build()
                 val groupAggregation = GroupAggregationInput.builder()
-                    .withBy(listOf("category"))
+                    .withBy(
+                        listOf(
+                            GroupByInput.builder()
+                                .withKey("category")
+                                .build()
+                        )
+                    )
                     .withAggregations(
                         listOf(
                             AggregationInput.builder()

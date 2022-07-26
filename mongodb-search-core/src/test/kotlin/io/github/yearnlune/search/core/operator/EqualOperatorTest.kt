@@ -15,7 +15,8 @@ class EqualOperatorTest : DescribeSpec({
         context("이름을 검색하려고 할 때") {
             it("이름에 대한 \$in query를 반환한다.") {
                 val equalOperator = EqualOperator(searchBy, values).buildQuery()
-                val expectedQuery = "{ \"$searchBy\" : { \"\$in\" : ${jacksonObjectMapper().writeValueAsString(values)}}}"
+                val expectedQuery =
+                    "{ \"$searchBy\" : { \"\$in\" : ${jacksonObjectMapper().writeValueAsString(values)}}}"
 
                 SerializationUtils.serializeToJsonSafely(Query(equalOperator).queryObject) shouldBe expectedQuery
             }

@@ -9,85 +9,9 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.data.mongodb.core.aggregation.Aggregation
-import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.SerializationUtils
 
-class QueryExtensionTest : DescribeSpec({
-
-    describe("search") {
-        context("equal operator") {
-            it("검색어가 하나 일 때") {
-                val searchInput: SearchInput =
-                    SearchInput.builder().withBy("name").withType(PropertyType.STRING).withValue(listOf("사과"))
-                        .withOperator(SearchOperatorType.EQUAL).build()
-
-                val criteria = Criteria().search(listOf(searchInput), Product::class.java)
-                SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                        "{ \"name\" : { \"\$in\" : [\"사과\"]}}"
-            }
-
-            it("검색어가 여러 개 일 때") {
-                val searchInput: SearchInput =
-                    SearchInput.builder().withBy("name").withType(PropertyType.STRING).withValue(listOf("사과", "바나나"))
-                        .withOperator(SearchOperatorType.EQUAL).build()
-                val criteria = Criteria().search(listOf(searchInput), Product::class.java)
-                SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe "{ \"name\" : { \"\$in\" : [\"사과\", \"바나나\"]}}"
-            }
-        }
-
-        context("contain operator") {
-            it("검색어가 하나 일 때") {
-                val searchInput: SearchInput =
-                    SearchInput.builder().withBy("name").withType(PropertyType.STRING).withValue(listOf("사과"))
-                        .withOperator(SearchOperatorType.CONTAIN).build()
-
-                val criteria = Criteria().search(listOf(searchInput), Product::class.java)
-                SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe "{ \"name\" : { \"\$regularExpression\" : { \"pattern\" : \"사과\", \"options\" : \"iu\"}}}"
-            }
-        }
-
-        context("between operator") {
-            it("long 타입의 timestamp일 때") {
-                val start = 1657767559757L
-                val searchInput: SearchInput = SearchInput.builder().withBy("updated_at").withType(PropertyType.DATE)
-                    .withValue(listOf("$start", "${start + 1000L}")).withOperator(SearchOperatorType.BETWEEN).build()
-
-                val criteria = Criteria().search(listOf(searchInput), Product::class.java)
-                SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                        "{ \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}"
-            }
-
-            it("objectId 타입일 때") {
-                val start = 1657767559757L
-                val searchInput: SearchInput = SearchInput.builder().withBy("id").withType(PropertyType.OBJECT_ID)
-                    .withValue(listOf("$start", "${start + 1000L}")).withOperator(SearchOperatorType.BETWEEN).build()
-
-                val criteria = Criteria().search(listOf(searchInput), Product::class.java)
-                SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                        "{ \"id\" : { \"\$gte\" : { \"\$oid\" : \"62cf86870000000000000000\"}, \"\$lt\" : { \"\$oid\" : \"62cf86880000000000000000\"}}}"
-            }
-        }
-
-        context("aggregate pipeline에서 활용할 때") {
-            it("\$match를 query를 추가하여 반환한다.") {
-                val start = 1657767559757L
-                val searches: List<SearchInput> = listOf(
-                    SearchInput.builder()
-                        .withBy("updated_at")
-                        .withType(PropertyType.DATE)
-                        .withValue(listOf("$start", "${start + 1000L}"))
-                        .withOperator(SearchOperatorType.BETWEEN).build()
-                )
-                SerializationUtils.serializeToJsonSafely(
-                    Aggregation.newAggregation(
-                        Aggregation.match(Criteria.where("deleted").exists(false))
-                    ).search(searches, Product::class.java).toPipeline(Aggregation.DEFAULT_CONTEXT)
-                ) shouldBe "[{ \"\$match\" : { \"deleted\" : { \"\$exists\" : false}}}, " +
-                        "{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}}]"
-            }
-        }
-    }
+class QueryExtensionAggregateTest : DescribeSpec({
 
     describe("aggregate") {
         context("group") {
@@ -104,7 +28,13 @@ class QueryExtensionTest : DescribeSpec({
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
                         val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(listOf("category"))
+                            .withBy(
+                                listOf(
+                                    GroupByInput.Builder()
+                                        .withKey("category")
+                                        .build()
+                                )
+                            )
                             .withAggregations(
                                 listOf(
                                     AggregationInput.builder()
@@ -136,7 +66,13 @@ class QueryExtensionTest : DescribeSpec({
                             .buildAggregation()
 
                         val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(listOf("category"))
+                            .withBy(
+                                listOf(
+                                    GroupByInput.Builder()
+                                        .withKey("category")
+                                        .build()
+                                )
+                            )
                             .withAggregations(
                                 listOf(
                                     AggregationInput.builder()
@@ -164,7 +100,13 @@ class QueryExtensionTest : DescribeSpec({
                                     .buildAggregation()
 
                                 val groupAggregation = GroupAggregationInput.builder()
-                                    .withBy(listOf("category"))
+                                    .withBy(
+                                        listOf(
+                                            GroupByInput.Builder()
+                                                .withKey("category")
+                                                .build()
+                                        )
+                                    )
                                     .withAggregations(
                                         listOf(
                                             AggregationInput.builder()
@@ -190,7 +132,13 @@ class QueryExtensionTest : DescribeSpec({
                                     .buildAggregation()
 
                                 val groupAggregation = GroupAggregationInput.builder()
-                                    .withBy(listOf("category"))
+                                    .withBy(
+                                        listOf(
+                                            GroupByInput.Builder()
+                                                .withKey("category")
+                                                .build()
+                                        )
+                                    )
                                     .withAggregations(
                                         listOf(
                                             AggregationInput.builder()
@@ -227,7 +175,13 @@ class QueryExtensionTest : DescribeSpec({
                             .buildAggregation()
 
                         val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(listOf("category"))
+                            .withBy(
+                                listOf(
+                                    GroupByInput.Builder()
+                                        .withKey("category")
+                                        .build()
+                                )
+                            )
                             .withAggregations(
                                 listOf(
                                     AggregationInput.builder()
@@ -249,8 +203,138 @@ class QueryExtensionTest : DescribeSpec({
                 }
             }
 
+            context("기간별 그룹을 낼 경우") {
+                val start = "1595731371000"
+                val end = "1658803371000"
+                val searchInput: SearchInput = SearchInput.builder()
+                    .withBy("updated_at")
+                    .withType(PropertyType.DATE)
+                    .withValue(listOf(start, end))
+                    .withOperator(SearchOperatorType.BETWEEN).build()
+
+                context("일별") {
+                    it("일별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
+                        val aggregates = SearchOperatorDelegator()
+                            .create(searchInput, Product::class.java)
+                            .buildAggregation()
+                        val groupAggregation = GroupAggregationInput.builder()
+                            .withBy(
+                                listOf(
+                                    GroupByInput.Builder()
+                                        .withKey("updatedAt")
+                                        .withOption(GroupByOptionType.DAILY)
+                                        .build()
+                                )
+                            )
+                            .withAggregations(
+                                listOf(
+                                    AggregationInput.builder()
+                                        .withProperty("stockQuantity")
+                                        .withOperator(AggregateOperatorType.SUM)
+                                        .build()
+                                )
+                            )
+                            .build()
+                        SerializationUtils.serializeToJsonSafely(
+                            aggregates.aggregate(listOf(groupAggregation), Product::class.java)
+                                .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                        ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : $start, \"\$lt\" : $end}}}, { \"\$addFields\" : { \"updated_at_0\" : { \"\$dateToString\" : { \"format\" : \"%Y%m%d\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_0\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                    }
+                }
+
+                context("주별") {
+                    it("주별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
+                        val aggregates = SearchOperatorDelegator()
+                            .create(searchInput, Product::class.java)
+                            .buildAggregation()
+                        val groupAggregation = GroupAggregationInput.builder()
+                            .withBy(
+                                listOf(
+                                    GroupByInput.Builder()
+                                        .withKey("updatedAt")
+                                        .withOption(GroupByOptionType.WEEKLY)
+                                        .build()
+                                )
+                            )
+                            .withAggregations(
+                                listOf(
+                                    AggregationInput.builder()
+                                        .withProperty("stockQuantity")
+                                        .withOperator(AggregateOperatorType.SUM)
+                                        .build()
+                                )
+                            )
+                            .build()
+                        SerializationUtils.serializeToJsonSafely(
+                            aggregates.aggregate(listOf(groupAggregation), Product::class.java)
+                                .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                        ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : $start, \"\$lt\" : $end}}}, { \"\$addFields\" : { \"updated_at_1\" : { \"\$dateToString\" : { \"format\" : \"%Y%V\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_1\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                    }
+                }
+
+                context("월별") {
+                    it("월별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
+                        val aggregates = SearchOperatorDelegator()
+                            .create(searchInput, Product::class.java)
+                            .buildAggregation()
+                        val groupAggregation = GroupAggregationInput.builder()
+                            .withBy(
+                                listOf(
+                                    GroupByInput.Builder()
+                                        .withKey("updatedAt")
+                                        .withOption(GroupByOptionType.MONTHLY)
+                                        .build()
+                                )
+                            )
+                            .withAggregations(
+                                listOf(
+                                    AggregationInput.builder()
+                                        .withProperty("stockQuantity")
+                                        .withOperator(AggregateOperatorType.SUM)
+                                        .build()
+                                )
+                            )
+                            .build()
+                        SerializationUtils.serializeToJsonSafely(
+                            aggregates.aggregate(listOf(groupAggregation), Product::class.java)
+                                .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                        ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : $start, \"\$lt\" : $end}}}, { \"\$addFields\" : { \"updated_at_2\" : { \"\$dateToString\" : { \"format\" : \"%Y%m\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_2\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                    }
+                }
+
+                context("연도별") {
+                    it("연도별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
+                        val aggregates = SearchOperatorDelegator()
+                            .create(searchInput, Product::class.java)
+                            .buildAggregation()
+                        val groupAggregation = GroupAggregationInput.builder()
+                            .withBy(
+                                listOf(
+                                    GroupByInput.Builder()
+                                        .withKey("updatedAt")
+                                        .withOption(GroupByOptionType.YEARLY)
+                                        .build()
+                                )
+                            )
+                            .withAggregations(
+                                listOf(
+                                    AggregationInput.builder()
+                                        .withProperty("stockQuantity")
+                                        .withOperator(AggregateOperatorType.SUM)
+                                        .build()
+                                )
+                            )
+                            .build()
+                        SerializationUtils.serializeToJsonSafely(
+                            aggregates.aggregate(listOf(groupAggregation), Product::class.java)
+                                .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                        ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : $start, \"\$lt\" : $end}}}, { \"\$addFields\" : { \"updated_at_3\" : { \"\$dateToString\" : { \"format\" : \"%Y\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_3\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                    }
+                }
+            }
+
             context("올바른 값이 아닐 때") {
-                it ("ValidationException를 반환한다.") {
+                it("ValidationException를 반환한다.") {
                     val searchInput: SearchInput = SearchInput.builder()
                         .withBy("updated_at")
                         .withType(PropertyType.DATE)
@@ -304,7 +388,6 @@ class QueryExtensionTest : DescribeSpec({
                         ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                     ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$count\" : \"total\"}]"
                 }
-
             }
         }
     }

@@ -1,5 +1,6 @@
 package io.github.yearnlune.search.core.extension
 
+import io.github.yearnlune.search.core.domain.Product
 import io.github.yearnlune.search.graphql.PropertyType
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
@@ -7,6 +8,22 @@ import io.kotest.matchers.shouldBe
 import org.bson.types.ObjectId
 
 class CommonExtensionTest : DescribeSpec({
+
+    describe("getAllFields") {
+        context("객체의 필드 목록을 가져올 때") {
+            it("상속받은 객체의 필드 또한 가져온다.") {
+                Product::class.java.getAllFields().map { it.name } shouldBe mutableListOf(
+                    "name",
+                    "category",
+                    "price",
+                    "stockQuantity",
+                    "id",
+                    "updatedAt",
+                    "deleted"
+                )
+            }
+        }
+    }
 
     describe("snakeCase") {
         context("camelcase를 변환할 때") {
