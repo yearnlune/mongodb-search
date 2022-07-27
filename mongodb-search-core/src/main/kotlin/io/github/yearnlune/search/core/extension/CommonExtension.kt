@@ -39,6 +39,7 @@ fun String.toMongoType(type: PropertyType): Any {
         PropertyType.LONG -> this.toLong()
         PropertyType.FLOAT -> this.toFloat()
         PropertyType.DOUBLE -> this.toDouble()
+        PropertyType.NUMBER -> this.toDouble()
         PropertyType.BOOLEAN -> this.toBoolean()
         PropertyType.DATE -> this.toLong()
         PropertyType.OBJECT_ID -> try {
@@ -46,6 +47,7 @@ fun String.toMongoType(type: PropertyType): Any {
         } catch (_: NumberFormatException) {
             ObjectId(this)
         }
+        PropertyType.CURRENCY -> this.toDouble()
         else -> this
     }
 }

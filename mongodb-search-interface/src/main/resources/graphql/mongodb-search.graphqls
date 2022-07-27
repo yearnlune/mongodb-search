@@ -16,12 +16,18 @@ enum AggregateOperatorType {
 enum PropertyType {
     INTEGER
     LONG
-    DOUBLE
     FLOAT
+    DOUBLE
+    NUMBER
     BOOLEAN
     DATE
     STRING
     OBJECT_ID
+    CURRENCY
+    IMAGE
+    ENUM
+    USER
+    GROUP
 }
 
 enum GroupByOptionType {
@@ -43,6 +49,12 @@ enum ChartType {
 enum ChartValueType {
     ORIGIN
     PERCENTAGE
+}
+
+enum ColorPaletteType {
+    BASIC
+    VIVID
+    PASTEL
 }
 
 input SortInput {
@@ -89,16 +101,31 @@ input StatisticInput {
     aggregates: [JSON]! = []
 }
 
-input ChartInput {
+input DreamChartInput {
     title: String
     description: String
     type: ChartType
     colorPalette: String
-    value: ChartValueType
-    dataset: ChartDatasetInput
+    valueType: ChartValueType
+    datasetMeta: DreamChartDatasetMetaInput
 }
 
-input ChartDatasetInput {
+input DreamChartDatasetMetaInput {
     collection: String
     statistic: StatisticInput!
+}
+
+type DreamChart {
+    title: String
+    description: String
+    type: ChartType
+    colorPalette: ColorPaletteType
+    valueType: ChartValueType
+    xAxis: [String]!
+    datasets: [DreamChartDataset]!
+}
+
+type DreamChartDataset {
+    label: String!
+    data: [Long]!
 }
