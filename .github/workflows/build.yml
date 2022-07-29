@@ -24,7 +24,6 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@yearnlune'
       - name: Build package
         run: cd mongodb-search-interface/node && yarn && yarn build
       - name: Deploy package
