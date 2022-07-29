@@ -1,0 +1,5 @@
+dist
+graphql
+node_modules
+src/graphql.ts
+.yarn/cache

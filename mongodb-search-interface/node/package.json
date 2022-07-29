@@ -1,0 +1,39 @@
+{
+  "name": "@yearnlune/mongodb-search-interface",
+  "version": "0.0.1",
+  "description": "mongodb-search interface",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "yarn generate:graphql && tsc",
+    "generate:graphql": "node generator.js"
+  },
+  "keywords": [
+    "yearnlune",
+    "mongodb",
+    "graphql",
+    "search"
+  ],
+  "author": "DONGHWAN KIM",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yearnlune/mongodb-search.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yearnlune/mongodb-search/issues"
+  },
+  "homepage": "https://github.com/yearnlune/mongodb-search",
+  "devDependencies": {
+    "@nestjs/common": "^9.0.7",
+    "@nestjs/core": "^9.0.7",
+    "@nestjs/graphql": "^10.0.21",
+    "graphql": "^16.5.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.5.5",
+    "ts-morph": "^13.0.2",
+    "tsc": "^2.0.4",
+    "typescript": "^4.7.4"
+  },
+  "packageManager": "yarn@3.2.0"
+}

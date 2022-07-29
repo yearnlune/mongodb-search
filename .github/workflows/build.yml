@@ -1,5 +1,5 @@
 name: build
-on: [push, pull_request]
+on: [ push, pull_request ]
 jobs:
   build:
     name: Build
@@ -19,3 +19,15 @@ jobs:
           ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
         run: chmod +x ./gradlew && ./gradlew publish --no-daemon
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@yearnlune'
+      - name: Build package
+        run: yarn
+      - name: Deploy package
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

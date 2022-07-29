@@ -58,26 +58,26 @@ enum ColorPaletteType {
 }
 
 input SortInput {
-    property: String,
-    isDescending: Boolean
+    property: String!
+    isDescending: Boolean!
 }
 
 input SearchInput {
-    by: String
+    by: String!
     type: PropertyType!
     operator: SearchOperatorType!
-    value: [String]
+    value: [String!]!
 }
 
 input PageInput {
-    pageNumber: Long
-    pageSize: Long
-    sort: [SortInput]
+    pageNumber: Long!
+    pageSize: Long!
+    sort: [SortInput]! = []
     searches: [SearchInput]! = []
 }
 
 input AggregationInput {
-    property: String
+    property: String!
     operator: AggregateOperatorType!
     alias: String
 }
@@ -102,25 +102,25 @@ input StatisticInput {
 }
 
 input DreamChartInput {
-    title: String
+    title: String!
     description: String
-    type: ChartType
-    colorPalette: String
-    valueType: ChartValueType
-    datasetMeta: DreamChartDatasetMetaInput
+    type: ChartType!
+    colorPalette: String!
+    valueType: ChartValueType!
+    datasetMeta: DreamChartDatasetMetaInput!
 }
 
 input DreamChartDatasetMetaInput {
-    collection: String
+    collection: String!
     statistic: StatisticInput!
 }
 
 type DreamChart {
-    title: String
+    title: String!
     description: String
-    type: ChartType
-    colorPalette: ColorPaletteType
-    valueType: ChartValueType
+    type: ChartType!
+    colorPalette: ColorPaletteType!
+    valueType: ChartValueType!
     xAxis: [String]!
     datasets: [DreamChartDataset]!
 }
