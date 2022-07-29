@@ -28,6 +28,6 @@ jobs:
       - name: Build package
         run: cd mongodb-search-interface/node && yarn && yarn build
       - name: Deploy package
-        run: cd mongodb-search-interface/node && yarn publish
+        run: cd mongodb-search-interface/node && yarn publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
