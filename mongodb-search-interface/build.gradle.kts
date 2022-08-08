@@ -9,7 +9,7 @@ dependencies {
     implementation("com.graphql-java-generator:graphql-java-common-runtime:1.18.5")
 }
 
-val sourcesJar by tasks.register<Jar>("sourcesJar") {
+tasks.register<Jar>("sourcesJar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     dependsOn(JavaPlugin.CLASSES_TASK_NAME)
     from(sourceSets["main"].allSource)
@@ -30,7 +30,7 @@ tasks {
         mustRunAfter("generatePojo")
     }
     java {
-        sourcesJar
+        withSourcesJar()
     }
 }
 
