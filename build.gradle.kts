@@ -53,7 +53,7 @@ subprojects {
     configure<PublishingExtension> {
         publications {
             create<MavenPublication>("mavenKtx") {
-                from(components["kotlin"])
+                from(components["java"])
                 artifact(dokkaJavadocJar)
 
                 pom {
