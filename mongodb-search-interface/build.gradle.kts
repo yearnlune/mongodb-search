@@ -65,10 +65,3 @@ sourceSets {
         java.srcDirs("/build/generated/sources/graphqlGradlePlugin")
     }
 }
-
-//val sourcesJar by tasks.register<Jar>("sourcesJar") {
-//    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//    dependsOn(JavaPlugin.CLASSES_TASK_NAME)
-//    from(sourceSets["main"].allSource)
-//    archiveClassifier.set("sources")
-//}

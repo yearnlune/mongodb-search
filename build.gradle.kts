@@ -16,7 +16,7 @@ plugins {
 
 allprojects {
     group = "io.github.yearnlune.search"
-    version = "1.0.4"
+    version = "1.0.5"
 
     repositories {
         mavenCentral()
@@ -54,6 +54,7 @@ subprojects {
         publications {
             create<MavenPublication>("mavenKtx") {
                 from(components["kotlin"])
+                artifact(dokkaJavadocJar)
 
                 pom {
                     name.set(project.name)
