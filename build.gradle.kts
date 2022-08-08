@@ -37,17 +37,17 @@ subprojects {
 
     val projectDescription: String by project
 
-    val dokkaHtml by tasks.getting
+    val dokkaJavadoc by tasks.getting
 
     tasks.register<Zip>("dokkaZip") {
         from("$buildDir/dokka/html")
-        dependsOn(dokkaHtml)
+        dependsOn(dokkaJavadoc)
     }
 
     val dokkaJavadocJar by tasks.registering(Jar::class) {
         archiveClassifier.set("javadoc")
         from("$buildDir/dokka/html")
-        dependsOn(dokkaHtml)
+        dependsOn(dokkaJavadoc)
     }
 
     configure<PublishingExtension> {
