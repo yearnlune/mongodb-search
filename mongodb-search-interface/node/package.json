@@ -1,5 +1,5 @@
 {
-  "name": "@yearnlune/mongodb-search-interface",
+  "name": "mongodb-search-interface",
   "version": "0.0.1",
   "description": "mongodb-search interface",
   "license": "MIT",
