@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const packageJsonFile = '../package.json'
+const packageJsonFile = 'package.json'
 const arg = process.argv[2]
 let version = '';
 
