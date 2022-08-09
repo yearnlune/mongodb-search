@@ -4,13 +4,12 @@ const packageJsonFile = '../package.json'
 const arg = process.argv[0]
 let version = '';
 
-
 if (arg.match('v\d+\.\d+\.\d+|v\d+\.\d+\.\d+-rc\d+')) {
   version = arg.substring(1)
 } else if (arg.match('\d+\.\d+\.\d+|v\d+\.\d+\.\d+-rc\d+')) {
   version = arg
 } else {
-  console.error('INVALID VERSION')
+  console.error(`INVALID VERSION ${version}`)
   process.exit(1)
 }
 
