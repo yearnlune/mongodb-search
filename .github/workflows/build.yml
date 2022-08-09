@@ -31,9 +31,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Setup Version
         if: startsWith(github.ref, 'refs/tags/v')
-        env:
-          RELEASE_VERSION: ${{ steps.tag.outputs.tag }}
-        run: cd mongodb-search-interface/node && node .ci/set-version $RELEASE_VERSION
+        run: cd mongodb-search-interface/node && node .ci/set-version ${{ steps.tag.outputs.tag }}
       - name: Build package
         if: startsWith(github.ref, 'refs/tags/v')
         run: cd mongodb-search-interface/node && yarn && yarn build
