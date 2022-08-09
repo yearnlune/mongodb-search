@@ -115,7 +115,7 @@ input DreamChartDatasetMetaInput {
     statistic: StatisticInput!
 }
 
-type DreamChart {
+interface DreamChart {
     title: String!
     description: String
     type: ChartType!
