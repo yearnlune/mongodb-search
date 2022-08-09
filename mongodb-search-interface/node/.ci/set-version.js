@@ -15,5 +15,6 @@ if (arg.match('v\\d+\\.\\d+\\.\\d+|v\\d+\\.\\d+\\.\\d+-rc\\d+')) {
 
 const packageJson = JSON.parse(fs.readFileSync(packageJsonFile, { encoding: "utf-8"}))
 packageJson.version = version
+fs.writeFileSync(packageJsonFile, JSON.stringify(packageJson, null, 2));
 
 process.exit(0)
