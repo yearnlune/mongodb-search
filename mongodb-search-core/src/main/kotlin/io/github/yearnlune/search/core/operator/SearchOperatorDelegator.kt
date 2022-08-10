@@ -25,6 +25,7 @@ class SearchOperatorDelegator {
             SearchOperatorType.EQUAL -> EqualOperator(searchBy, typedValues)
             SearchOperatorType.CONTAIN -> ContainOperator(searchBy, typedValues)
             SearchOperatorType.BETWEEN -> BetweenOperator(searchBy, typedValues)
+            SearchOperatorType.START_WITH -> StartWithOperator(searchBy, typedValues)
             else -> throw NotSupportedOperatorException("Not supported operator: ${searchInput.operator.name}")
         }
 

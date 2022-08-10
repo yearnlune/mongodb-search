@@ -4,6 +4,7 @@ scalar JSON
 enum SearchOperatorType {
     EQUAL
     CONTAIN
+    START_WITH
     BETWEEN
 }
 

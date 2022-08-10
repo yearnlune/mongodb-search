@@ -11,14 +11,27 @@ class ContainOperatorTest : DescribeSpec({
         val searchBy = "item"
 
         context("제품을 검색하려고 할 때") {
-            it("제품에 대한 \$regex query를 반환한다.") {
-                val values = listOf("apple")
+            context("제품이 하나일 때") {
+                it("제품에 대한 \$regex query를 반환한다.") {
+                    val values = listOf("apple")
 
-                val equalOperator = ContainOperator(searchBy, values).buildQuery()
-                val expectedQuery =
-                    "{ \"$searchBy\" : { \"\$regularExpression\" : { \"pattern\" : \"${values.first()}\", \"options\" : \"iu\"}}}"
+                    val equalOperator = ContainOperator(searchBy, values).buildQuery()
+                    val expectedQuery =
+                        "{ \"$searchBy\" : { \"\$regularExpression\" : { \"pattern\" : \"${values.first()}\", \"options\" : \"iu\"}}}"
 
-                SerializationUtils.serializeToJsonSafely(Query(equalOperator).queryObject) shouldBe expectedQuery
+                    SerializationUtils.serializeToJsonSafely(Query(equalOperator).queryObject) shouldBe expectedQuery
+                }
+            }
+            context("제품이 여러개 일 때") {
+                it("제품에 대한 \$regex query를 반환한다.") {
+                    val values = listOf("apple", "banana", "pineapple")
+
+                    val equalOperator = ContainOperator(searchBy, values).buildQuery()
+                    val expectedQuery =
+                        "{ \"$searchBy\" : { \"\$regularExpression\" : { \"pattern\" : \"${values.joinToString("|")}\", \"options\" : \"iu\"}}}"
+
+                    SerializationUtils.serializeToJsonSafely(Query(equalOperator).queryObject) shouldBe expectedQuery
+                }
             }
         }
 
@@ -26,11 +39,11 @@ class ContainOperatorTest : DescribeSpec({
             it("제품에 대한 \$regex query를 반환한다.") {
                 val values = listOf("apple.3++")
 
-                val equalOperator = ContainOperator(searchBy, values).buildQuery()
+                val containOperator = ContainOperator(searchBy, values).buildQuery()
                 val expectedQuery =
                     "{ \"$searchBy\" : { \"\$regularExpression\" : { \"pattern\" : \"apple\\\\.3\\\\+\\\\+\", \"options\" : \"iu\"}}}"
 
-                SerializationUtils.serializeToJsonSafely(Query(equalOperator).queryObject) shouldBe expectedQuery
+                SerializationUtils.serializeToJsonSafely(Query(containOperator).queryObject) shouldBe expectedQuery
             }
         }
     }
