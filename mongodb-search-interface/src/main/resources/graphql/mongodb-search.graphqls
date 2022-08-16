@@ -45,6 +45,7 @@ enum ChartType {
     PIE
     DOUGHNUT
     LINE
+    TABLE
 }
 
 enum ChartValueType {
@@ -95,6 +96,14 @@ input GroupAggregationInput {
 
 input CountAggregationInput {
     alias: String
+}
+
+input LimitAggregationInput {
+    maxElements: Long!
+}
+
+input SortAggregationInput {
+    sorts: [SortInput]! = []
 }
 
 input StatisticInput {

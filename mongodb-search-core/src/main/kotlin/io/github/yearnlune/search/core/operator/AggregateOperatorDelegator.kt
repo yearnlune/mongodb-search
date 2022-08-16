@@ -7,6 +7,8 @@ import io.github.yearnlune.search.graphql.AggregateOperatorType
 import io.github.yearnlune.search.graphql.AggregationInput
 import io.github.yearnlune.search.graphql.CountAggregationInput
 import io.github.yearnlune.search.graphql.GroupAggregationInput
+import io.github.yearnlune.search.graphql.LimitAggregationInput
+import io.github.yearnlune.search.graphql.SortAggregationInput
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 
 class AggregateOperatorDelegator {
@@ -39,6 +41,12 @@ class AggregateOperatorDelegator {
             }
             is CountAggregationInput -> {
                 aggregateOperator.add(CountOperator(aggregationInput.alias))
+            }
+            is LimitAggregationInput -> {
+                aggregateOperator.add(LimitOperator(aggregationInput.maxElements))
+            }
+            is SortAggregationInput -> {
+                aggregateOperator.add(SortOperator(aggregationInput.sorts))
             }
             else -> {
                 throw NotSupportedOperatorException("Not supported operator: ${aggregationInput::class.simpleName}")

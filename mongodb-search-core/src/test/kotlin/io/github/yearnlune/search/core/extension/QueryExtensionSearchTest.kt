@@ -67,6 +67,23 @@ class QueryExtensionSearchTest : DescribeSpec({
             }
         }
 
+        context("startWith operator") {
+            it("String 타입일 때") {
+                val property = "ip"
+                val startWith = "192.168.12"
+                val searchInput: SearchInput = SearchInput.builder()
+                    .withBy(property)
+                    .withType(PropertyType.STRING)
+                    .withValue(listOf(startWith))
+                    .withOperator(SearchOperatorType.START_WITH)
+                    .build()
+
+                val criteria = Criteria().search(listOf(searchInput), Any::class.java)
+                SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
+                        "{ \"$property\" : { \"\$regularExpression\" : { \"pattern\" : \"^192\\\\.168\\\\.12\", \"options\" : \"iu\"}}}"
+            }
+        }
+
         context("aggregate pipeline에서 활용할 때") {
             it("\$match를 query를 추가하여 반환한다.") {
                 val start = 1657767559757L

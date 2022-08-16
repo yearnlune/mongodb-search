@@ -390,5 +390,58 @@ class QueryExtensionAggregateTest : DescribeSpec({
                 }
             }
         }
+
+        context("limit") {
+            context("상위 데이터를 가져올 때") {
+                it("\$limit 를 사용한다.") {
+                    val searchInput: SearchInput = SearchInput.builder()
+                        .withBy("name")
+                        .withType(PropertyType.STRING)
+                        .withValue(listOf("사과", "바나나", "세제"))
+                        .withOperator(SearchOperatorType.EQUAL).build()
+                    val limitAggregation = LimitAggregationInput.builder()
+                        .withMaxElements(5L)
+                        .build()
+
+                    SerializationUtils.serializeToJsonSafely(
+                        MongoSearch.statistic(
+                            StatisticInput.builder()
+                                .withSearches(listOf(searchInput))
+                                .withAggregates(listOf(limitAggregation))
+                                .build(),
+                            Product::class.java
+                        ).toPipeline(Aggregation.DEFAULT_CONTEXT)
+                    ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$limit\" : 5}]"
+                }
+            }
+        }
+
+        context("sort") {
+            context("데이터를 정렬 할 때") {
+                it("\$sort 를 사용한다") {
+                    val searchInput: SearchInput = SearchInput.builder()
+                        .withBy("name")
+                        .withType(PropertyType.STRING)
+                        .withValue(listOf("사과", "바나나", "세제"))
+                        .withOperator(SearchOperatorType.EQUAL).build()
+                    val sortAggregation = SortAggregationInput.builder()
+                        .withSorts(listOf(SortInput.builder()
+                            .withProperty("name")
+                            .withIsDescending(false)
+                            .build()))
+                        .build()
+
+                    SerializationUtils.serializeToJsonSafely(
+                        MongoSearch.statistic(
+                            StatisticInput.builder()
+                                .withSearches(listOf(searchInput))
+                                .withAggregates(listOf(sortAggregation))
+                                .build(),
+                            Product::class.java
+                        ).toPipeline(Aggregation.DEFAULT_CONTEXT)
+                    ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$sort\" : { \"name\" : 1}}]"
+                }
+            }
+        }
     }
 })
