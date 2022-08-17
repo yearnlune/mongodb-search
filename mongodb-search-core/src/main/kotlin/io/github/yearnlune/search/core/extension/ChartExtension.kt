@@ -1,16 +1,14 @@
 package io.github.yearnlune.search.core.extension
 
+import io.github.yearnlune.search.core.MongoSearch
 import io.github.yearnlune.search.graphql.DreamChart
 import io.github.yearnlune.search.graphql.DreamChartDataset
 import io.github.yearnlune.search.graphql.DreamChartInput
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.aggregation.Aggregation
 
 fun MongoTemplate.dreamChart(chart: DreamChartInput): DreamChart {
     val results = this.aggregate(
-        Aggregation.newAggregation()
-            .search(chart.datasetMeta.statistic.searches, Any::class.java)
-            .aggregate(chart.datasetMeta.statistic.aggregates, Any::class.java),
+        MongoSearch.statistic(chart.datasetMeta.statistic, Any::class.java),
         chart.datasetMeta.collection,
         Map::class.java
     ).mappedResults
@@ -24,7 +22,7 @@ fun MongoTemplate.dreamChart(chart: DreamChartInput): DreamChart {
             .map {
                 values.compute(it.key as String) { _, v ->
                     val list = v ?: mutableListOf()
-                    list.add(it.value as Long)
+                    list.add(it.value.toString().toLong())
                     list
                 }
             }
