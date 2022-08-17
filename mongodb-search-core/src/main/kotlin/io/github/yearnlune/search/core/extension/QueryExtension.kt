@@ -47,7 +47,7 @@ fun List<String>.toMongoFields(): Fields {
     var fields = Fields.fields()
 
     this.forEach {
-        fields = fields.and(it, "\$$it")
+        fields = fields.and(it.replace(".", "@"), "\$$it")
     }
 
     return fields
