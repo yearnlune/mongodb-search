@@ -12,11 +12,12 @@ buildscript {
 
 plugins {
     kotlin("jvm") version "1.7.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
 
 allprojects {
     group = "io.github.yearnlune.search"
-    version = "1.0.9-rc3"
+    version = "1.0.9"
 
     repositories {
         mavenCentral()
