@@ -4,7 +4,19 @@ import io.github.yearnlune.search.core.MongoSearch
 import io.github.yearnlune.search.core.domain.Product
 import io.github.yearnlune.search.core.exception.ValidationException
 import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
-import io.github.yearnlune.search.graphql.*
+import io.github.yearnlune.search.graphql.AggregateOperatorType
+import io.github.yearnlune.search.graphql.AggregationInput
+import io.github.yearnlune.search.graphql.CountAggregationInput
+import io.github.yearnlune.search.graphql.GroupAggregationInput
+import io.github.yearnlune.search.graphql.GroupByInput
+import io.github.yearnlune.search.graphql.GroupByOptionType
+import io.github.yearnlune.search.graphql.LimitAggregationInput
+import io.github.yearnlune.search.graphql.PropertyType
+import io.github.yearnlune.search.graphql.SearchInput
+import io.github.yearnlune.search.graphql.SearchOperatorType
+import io.github.yearnlune.search.graphql.SortAggregationInput
+import io.github.yearnlune.search.graphql.SortInput
+import io.github.yearnlune.search.graphql.StatisticInput
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -47,7 +59,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
                         ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, " +
-                                "{ \"\$group\" : { \"_id\" : \"\$category\", \"count\" : { \"\$sum\" : 1}}}]"
+                            "{ \"\$group\" : { \"_id\" : \"\$category\", \"count\" : { \"\$sum\" : 1}}}]"
                     }
                 }
             }
@@ -89,7 +101,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             )
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
                         ) shouldBe "[{ \"\$match\" : { \"price\" : { \"\$gte\" : 0.0, \"\$lt\" : 100.0}}}, " +
-                                "{ \"\$group\" : { \"_id\" : \"\$category\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                            "{ \"\$group\" : { \"_id\" : \"\$category\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
                     }
 
                     context("올바른 값이 아닐 때") {
@@ -198,7 +210,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             )
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
                         ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : 1657854891000, \"\$lt\" : 1659150891000}}}, " +
-                                "{ \"\$group\" : { \"_id\" : \"\$category\", \"price_avg\" : { \"\$avg\" : \"\$price\"}}}]"
+                            "{ \"\$group\" : { \"_id\" : \"\$category\", \"price_avg\" : { \"\$avg\" : \"\$price\"}}}]"
                     }
                 }
             }
@@ -355,7 +367,6 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         )
                         .build()
 
-
                     shouldThrow<ValidationException> {
                         aggregates.aggregate(
                             listOf(groupAggregation),
@@ -425,10 +436,14 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         .withValue(listOf("사과", "바나나", "세제"))
                         .withOperator(SearchOperatorType.EQUAL).build()
                     val sortAggregation = SortAggregationInput.builder()
-                        .withSorts(listOf(SortInput.builder()
-                            .withProperty("name")
-                            .withIsDescending(false)
-                            .build()))
+                        .withSorts(
+                            listOf(
+                                SortInput.builder()
+                                    .withProperty("name")
+                                    .withIsDescending(false)
+                                    .build()
+                            )
+                        )
                         .build()
 
                     SerializationUtils.serializeToJsonSafely(

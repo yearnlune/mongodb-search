@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.query.SerializationUtils
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.TimeZone
 
 class BetweenOperatorTest : DescribeSpec({
 
@@ -22,7 +22,10 @@ class BetweenOperatorTest : DescribeSpec({
                 val betweenOperator =
                     BetweenOperator(searchBy, listOf(start.toObjectId(), end.toObjectId())).buildQuery()
                 val expectedQuery =
-                    "{ \"$searchBy\" : { \"\$gte\" : { \"\$oid\" : \"${start.toObjectId()}\"}, \"\$lt\" : { \"\$oid\" : \"${end.toObjectId()}\"}}}"
+                    "{ \"$searchBy\" : " +
+                        "{ \"\$gte\" : { \"\$oid\" : \"${start.toObjectId()}\"}, " +
+                        "\"\$lt\" : { \"\$oid\" : \"${end.toObjectId()}\"}}" +
+                        "}"
 
                 SerializationUtils.serializeToJsonSafely(Query(betweenOperator).queryObject) shouldBe expectedQuery
             }

@@ -22,7 +22,7 @@ class QueryExtensionSearchTest : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                        "{ \"name\" : { \"\$in\" : [\"사과\"]}}"
+                    "{ \"name\" : { \"\$in\" : [\"사과\"]}}"
             }
 
             it("검색어가 여러 개 일 때") {
@@ -53,7 +53,7 @@ class QueryExtensionSearchTest : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                        "{ \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}"
+                    "{ \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}"
             }
 
             it("objectId 타입일 때") {
@@ -63,7 +63,7 @@ class QueryExtensionSearchTest : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                        "{ \"id\" : { \"\$gte\" : { \"\$oid\" : \"62cf86870000000000000000\"}, \"\$lt\" : { \"\$oid\" : \"62cf86880000000000000000\"}}}"
+                    "{ \"id\" : { \"\$gte\" : { \"\$oid\" : \"62cf86870000000000000000\"}, \"\$lt\" : { \"\$oid\" : \"62cf86880000000000000000\"}}}"
             }
         }
 
@@ -80,7 +80,7 @@ class QueryExtensionSearchTest : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Any::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                        "{ \"$property\" : { \"\$regularExpression\" : { \"pattern\" : \"^192\\\\.168\\\\.12\", \"options\" : \"iu\"}}}"
+                    "{ \"$property\" : { \"\$regularExpression\" : { \"pattern\" : \"^192\\\\.168\\\\.12\", \"options\" : \"iu\"}}}"
             }
         }
 
@@ -99,7 +99,7 @@ class QueryExtensionSearchTest : DescribeSpec({
                         Aggregation.match(Criteria.where("deleted").exists(false))
                     ).search(searches, Product::class.java).toPipeline(Aggregation.DEFAULT_CONTEXT)
                 ) shouldBe "[{ \"\$match\" : { \"deleted\" : { \"\$exists\" : false}}}, " +
-                        "{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}}]"
+                    "{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}}]"
             }
         }
     }

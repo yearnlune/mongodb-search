@@ -7,12 +7,12 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0")
         classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.6.20")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.3.0")
     }
 }
 
 plugins {
     kotlin("jvm") version "1.7.0"
-    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
 
 allprojects {
@@ -35,6 +35,7 @@ subprojects {
     apply(plugin = "kotlin")
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     val projectDescription: String by project
 

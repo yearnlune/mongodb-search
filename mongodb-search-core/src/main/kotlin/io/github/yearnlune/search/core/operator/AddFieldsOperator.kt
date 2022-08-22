@@ -1,7 +1,11 @@
 package io.github.yearnlune.search.core.operator
 
 import io.github.yearnlune.search.graphql.GroupByOptionType
-import org.springframework.data.mongodb.core.aggregation.*
+import org.springframework.data.mongodb.core.aggregation.AddFieldsOperation
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation
+import org.springframework.data.mongodb.core.aggregation.ConvertOperators
+import org.springframework.data.mongodb.core.aggregation.DateOperators
 import org.springframework.data.mongodb.core.schema.JsonSchemaObject
 
 class AddFieldsOperator(

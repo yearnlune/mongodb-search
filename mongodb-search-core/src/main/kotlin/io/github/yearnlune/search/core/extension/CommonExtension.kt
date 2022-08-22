@@ -18,7 +18,11 @@ fun <T> Class<T>.getFieldPath(fieldName: String, snakeCase: Boolean = false): St
     val fields = this.getAllFields()
         .associateBy { if (snakeCase) it.name.snakeCase() else it.name }
 
-    return if (fields.containsKey(name)) name else throw NotFoundFieldException("Not found field: '$name' at [${this.simpleName}]")
+    return if (fields.containsKey(name)) {
+        name
+    } else {
+        throw NotFoundFieldException("Not found field: '$name' at [${this.simpleName}]")
+    }
 }
 
 fun <T> Class<T>.getAllFields(): MutableList<Field> {

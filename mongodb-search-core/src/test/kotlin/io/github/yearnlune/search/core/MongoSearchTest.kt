@@ -1,7 +1,15 @@
 package io.github.yearnlune.search.core
 
 import io.github.yearnlune.search.core.domain.Product
-import io.github.yearnlune.search.graphql.*
+import io.github.yearnlune.search.graphql.AggregateOperatorType
+import io.github.yearnlune.search.graphql.AggregationInput
+import io.github.yearnlune.search.graphql.CountAggregationInput
+import io.github.yearnlune.search.graphql.GroupAggregationInput
+import io.github.yearnlune.search.graphql.GroupByInput
+import io.github.yearnlune.search.graphql.PropertyType
+import io.github.yearnlune.search.graphql.SearchInput
+import io.github.yearnlune.search.graphql.SearchOperatorType
+import io.github.yearnlune.search.graphql.StatisticInput
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import org.springframework.data.mongodb.core.aggregation.Aggregation
@@ -32,7 +40,8 @@ class MongoSearchTest : DescribeSpec({
                             .withValue(listOf("0.0", "100.0"))
                             .withOperator(SearchOperatorType.BETWEEN)
                             .build()
-                    ), Product::class.java
+                    ),
+                    Product::class.java
                 )
 
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe "{ \"name\" : { \"\$regularExpression\" : { \"pattern\" : \"사과\", \"options\" : \"iu\"}}, \"updated_at\" : { \"\$gte\" : 1657854891000, \"\$lt\" : 1659150891000}, \"price\" : { \"\$gte\" : 0.0, \"\$lt\" : 100.0}}"

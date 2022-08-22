@@ -29,5 +29,4 @@ class SortOperator(
             Sort.Direction.ASC
         }
     }
-
 }
