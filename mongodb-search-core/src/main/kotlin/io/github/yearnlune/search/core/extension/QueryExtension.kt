@@ -30,7 +30,14 @@ fun Aggregation.aggregate(aggregates: List<Any>, targetClass: Class<*>): Aggrega
     operations.addAll(this.pipeline.operations)
 
     aggregates.forEach {
-        operations.addAll(AggregateOperatorDelegator().create(it, targetClass).buildAggregate())
+        operations.addAll(
+            AggregateOperatorDelegator()
+                .create(
+                    if (it is Map<*, *>) it.toAggregationInput() else it,
+                    targetClass
+                )
+                .buildAggregate()
+        )
     }
 
     return Aggregation.newAggregation(operations)

@@ -1,7 +1,13 @@
 package io.github.yearnlune.search.core.extension
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.yearnlune.search.core.exception.NotFoundFieldException
+import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
+import io.github.yearnlune.search.graphql.CountAggregationInput
+import io.github.yearnlune.search.graphql.GroupAggregationInput
+import io.github.yearnlune.search.graphql.LimitAggregationInput
 import io.github.yearnlune.search.graphql.PropertyType
+import io.github.yearnlune.search.graphql.SortAggregationInput
 import org.bson.types.ObjectId
 import java.lang.reflect.Field
 import java.util.regex.Pattern
@@ -60,3 +66,23 @@ fun Long.toObjectId(): ObjectId = ObjectId(floor((this / 1000).toDouble()).toLon
 
 fun String.escapeSpecialRegexChars(): String =
     Pattern.compile("[{}()\\[\\].,+*?^$#\\\\|-]").matcher(this).replaceAll("\\\\$0")
+
+fun Map<*, *>.toAggregationInput(): Any {
+    val aggregations = listOf(
+        GroupAggregationInput::class.java,
+        CountAggregationInput::class.java,
+        LimitAggregationInput::class.java,
+        SortAggregationInput::class.java
+    )
+    val objectMapper = jacksonObjectMapper()
+    var aggregation: Any? = null
+
+    aggregations.forEach {
+        try {
+            aggregation = objectMapper.convertValue(this, it)
+        } catch (_: Exception) {
+        }
+    }
+
+    return aggregation ?: throw NotSupportedOperatorException("Not supported operator: $this")
+}
