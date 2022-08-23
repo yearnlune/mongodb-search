@@ -6,6 +6,7 @@ enum SearchOperatorType {
     CONTAIN
     START_WITH
     BETWEEN
+    EXISTS
 }
 
 enum AggregationAccumulatorOperatorType {
