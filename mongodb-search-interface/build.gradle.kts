@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.backend.common.push
 
 plugins {
-    id("com.graphql_java_generator.graphql-gradle-plugin") version "1.18.6"
+    id("com.graphql_java_generator.graphql-gradle-plugin") version "1.18.7"
 }
 
 dependencies {
     implementation("com.graphql-java:graphql-java-extended-scalars:18.1")
-    implementation("com.graphql-java-generator:graphql-java-common-runtime:1.18.5")
+    implementation("com.graphql-java-generator:graphql-java-common-runtime:1.18.7")
 }
 
 tasks.register<Jar>("sourcesJar") {
