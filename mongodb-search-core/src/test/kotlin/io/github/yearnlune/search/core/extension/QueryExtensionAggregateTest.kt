@@ -4,9 +4,11 @@ import io.github.yearnlune.search.core.MongoSearch
 import io.github.yearnlune.search.core.domain.Product
 import io.github.yearnlune.search.core.exception.ValidationException
 import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
-import io.github.yearnlune.search.graphql.AggregateOperatorType
+import io.github.yearnlune.search.graphql.AggregationAccumulatorOperatorType
 import io.github.yearnlune.search.graphql.AggregationInput
+import io.github.yearnlune.search.graphql.ConditionInput
 import io.github.yearnlune.search.graphql.CountAggregationInput
+import io.github.yearnlune.search.graphql.DataInput
 import io.github.yearnlune.search.graphql.GroupAggregationInput
 import io.github.yearnlune.search.graphql.GroupByInput
 import io.github.yearnlune.search.graphql.GroupByOptionType
@@ -50,7 +52,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             .withAggregations(
                                 listOf(
                                     AggregationInput.builder()
-                                        .withOperator(AggregateOperatorType.COUNT)
+                                        .withOperator(AggregationAccumulatorOperatorType.COUNT)
                                         .build()
                                 )
                             )
@@ -89,7 +91,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 listOf(
                                     AggregationInput.builder()
                                         .withProperty("stockQuantity")
-                                        .withOperator(AggregateOperatorType.SUM)
+                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
                                         .build()
                                 )
                             )
@@ -106,7 +108,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
 
                     context("올바른 값이 아닐 때") {
                         context("필드 지정을 하지 않았을 때") {
-                            it("IllegalArgumentException을 반환한다.") {
+                            it("ValidationException을 반환한다.") {
                                 val aggregates = SearchOperatorDelegator()
                                     .create(searchInput, Product::class.java)
                                     .buildAggregation()
@@ -122,13 +124,13 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                     .withAggregations(
                                         listOf(
                                             AggregationInput.builder()
-                                                .withOperator(AggregateOperatorType.SUM)
+                                                .withOperator(AggregationAccumulatorOperatorType.SUM)
                                                 .build()
                                         )
                                     )
                                     .build()
 
-                                shouldThrow<IllegalArgumentException> {
+                                shouldThrow<ValidationException> {
                                     aggregates.aggregate(
                                         listOf(groupAggregation),
                                         Product::class.java
@@ -155,7 +157,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                         listOf(
                                             AggregationInput.builder()
                                                 .withProperty("")
-                                                .withOperator(AggregateOperatorType.SUM)
+                                                .withOperator(AggregationAccumulatorOperatorType.SUM)
                                                 .build()
                                         )
                                     )
@@ -169,6 +171,58 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 }
                             }
                         }
+                    }
+                }
+
+                context("특정 필드의 조건 그룹 별 총합을 구할 때") {
+                    it("\$group에서 \$sum을 사용한다.") {
+                        val aggregates = SearchOperatorDelegator()
+                            .create(searchInput, Product::class.java)
+                            .buildAggregation()
+
+                        val groupAggregation = GroupAggregationInput.builder()
+                            .withBy(
+                                listOf(
+                                    GroupByInput.Builder()
+                                        .withKey("updatedAt")
+                                        .withOption(GroupByOptionType.MONTHLY)
+                                        .build()
+                                )
+                            )
+                            .withAggregations(
+                                listOf(
+                                    AggregationInput.builder()
+                                        .withPropertyExpression(
+                                            ConditionInput.builder()
+                                                .withIf(
+                                                    SearchInput.builder()
+                                                        .withBy("category")
+                                                        .withOperator(SearchOperatorType.EQUAL)
+                                                        .withType(PropertyType.STRING)
+                                                        .withValue(listOf("fruit"))
+                                                        .build()
+                                                )
+                                                .withThen(
+                                                    DataInput.builder()
+                                                        .withType(PropertyType.LONG)
+                                                        .withValue("1")
+                                                        .build()
+                                                )
+                                                .build()
+                                        )
+                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
+                                        .withAlias("과일종류")
+                                        .build()
+                                )
+                            )
+                            .build()
+                        SerializationUtils.serializeToJsonSafely(
+                            aggregates.aggregate(
+                                listOf(groupAggregation),
+                                Product::class.java
+                            )
+                                .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                        ) shouldBe "[{ \"\$match\" : { \"price\" : { \"\$gte\" : 0.0, \"\$lt\" : 100.0}}}, { \"\$addFields\" : { \"updated_at_2\" : { \"\$dateToString\" : { \"format\" : \"%Y%m\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_2\", \"과일종류\" : { \"\$sum\" : { \"\$cond\" : { \"if\" : { \"\$eq\" : [\"\$category\", \"fruit\"]}, \"then\" : 1, \"else\" : \"\$nullField\"}}}}}]"
                     }
                 }
             }
@@ -198,7 +252,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 listOf(
                                     AggregationInput.builder()
                                         .withProperty("price")
-                                        .withOperator(AggregateOperatorType.AVERAGE)
+                                        .withOperator(AggregationAccumulatorOperatorType.AVERAGE)
                                         .build()
                                 )
                             )
@@ -242,7 +296,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 listOf(
                                     AggregationInput.builder()
                                         .withProperty("stockQuantity")
-                                        .withOperator(AggregateOperatorType.SUM)
+                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
                                         .build()
                                 )
                             )
@@ -272,7 +326,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 listOf(
                                     AggregationInput.builder()
                                         .withProperty("stockQuantity")
-                                        .withOperator(AggregateOperatorType.SUM)
+                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
                                         .build()
                                 )
                             )
@@ -302,7 +356,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 listOf(
                                     AggregationInput.builder()
                                         .withProperty("stockQuantity")
-                                        .withOperator(AggregateOperatorType.SUM)
+                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
                                         .build()
                                 )
                             )
@@ -332,7 +386,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 listOf(
                                     AggregationInput.builder()
                                         .withProperty("stockQuantity")
-                                        .withOperator(AggregateOperatorType.SUM)
+                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
                                         .build()
                                 )
                             )
@@ -361,7 +415,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             listOf(
                                 AggregationInput.builder()
                                     .withProperty("price")
-                                    .withOperator(AggregateOperatorType.AVERAGE)
+                                    .withOperator(AggregationAccumulatorOperatorType.AVERAGE)
                                     .build()
                             )
                         )

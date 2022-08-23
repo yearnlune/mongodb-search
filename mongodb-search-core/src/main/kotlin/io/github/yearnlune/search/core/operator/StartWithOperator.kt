@@ -1,6 +1,8 @@
 package io.github.yearnlune.search.core.operator
 
+import io.github.yearnlune.search.core.exception.NotSupportedExpressionException
 import io.github.yearnlune.search.core.extension.escapeSpecialRegexChars
+import org.springframework.data.mongodb.core.aggregation.AggregationExpression
 import org.springframework.data.mongodb.core.query.Criteria
 import java.util.regex.Pattern
 
@@ -15,4 +17,8 @@ class StartWithOperator(
             Pattern.CASE_INSENSITIVE or Pattern.UNICODE_CASE
         )
     )
+
+    override fun buildExpression(operatorType: Any?): AggregationExpression {
+        throw NotSupportedExpressionException("$operatorType")
+    }
 }

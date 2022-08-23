@@ -1,5 +1,6 @@
 package io.github.yearnlune.search.core.operator
 
+import org.springframework.data.mongodb.core.aggregation.AggregationExpression
 import org.springframework.data.mongodb.core.query.Criteria
 
 abstract class SearchOperator(
@@ -15,6 +16,8 @@ abstract class SearchOperator(
         val searchCriteria = initializeCriteriaWithTarget(criteria)
         return appendExpression(searchCriteria)
     }
+
+    abstract fun buildExpression(operatorType: Any?): AggregationExpression
 
     private fun initializeCriteriaWithTarget(criteria: Criteria? = null): Criteria {
         return criteria?.and(searchBy) ?: Criteria.where(searchBy)

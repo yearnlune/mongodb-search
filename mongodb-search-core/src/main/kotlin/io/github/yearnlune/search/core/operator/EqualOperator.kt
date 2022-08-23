@@ -1,5 +1,9 @@
 package io.github.yearnlune.search.core.operator
 
+import io.github.yearnlune.search.core.exception.NotSupportedExpressionException
+import io.github.yearnlune.search.graphql.ComparisonOperatorType
+import org.springframework.data.mongodb.core.aggregation.AggregationExpression
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators
 import org.springframework.data.mongodb.core.query.Criteria
 
 class EqualOperator(
@@ -8,4 +12,11 @@ class EqualOperator(
 ) : SearchOperator(searchBy, values) {
 
     override fun appendExpression(criteria: Criteria): Criteria = criteria.`in`(values)
+
+    override fun buildExpression(operatorType: Any?): AggregationExpression {
+        return when (operatorType) {
+            ComparisonOperatorType.EQUAL -> ComparisonOperators.Eq.valueOf(searchBy).equalToValue(values[0])
+            else -> throw NotSupportedExpressionException("")
+        }
+    }
 }

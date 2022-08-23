@@ -6,6 +6,7 @@ import io.github.yearnlune.search.core.extension.toMongoType
 import io.github.yearnlune.search.graphql.SearchInput
 import io.github.yearnlune.search.graphql.SearchOperatorType
 import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.AggregationExpression
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.MatchOperation
 import org.springframework.data.mongodb.core.query.Criteria
@@ -33,6 +34,8 @@ class SearchOperatorDelegator {
     }
 
     fun buildQuery(criteria: Criteria? = null): Criteria = searchOperator.buildQuery(criteria)
+
+    fun buildExpression(operatorType: Any?): AggregationExpression = searchOperator.buildExpression(operatorType)
 
     fun buildAggregation(): Aggregation = Aggregation.newAggregation(buildMatchOperation())
 

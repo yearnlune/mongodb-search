@@ -1,7 +1,7 @@
 package io.github.yearnlune.search.core
 
 import io.github.yearnlune.search.core.domain.Product
-import io.github.yearnlune.search.graphql.AggregateOperatorType
+import io.github.yearnlune.search.graphql.AggregationAccumulatorOperatorType
 import io.github.yearnlune.search.graphql.AggregationInput
 import io.github.yearnlune.search.graphql.CountAggregationInput
 import io.github.yearnlune.search.graphql.GroupAggregationInput
@@ -105,11 +105,11 @@ class MongoSearchTest : DescribeSpec({
                     .withAggregations(
                         listOf(
                             AggregationInput.builder()
-                                .withOperator(AggregateOperatorType.COUNT)
+                                .withOperator(AggregationAccumulatorOperatorType.COUNT)
                                 .build(),
                             AggregationInput.builder()
                                 .withProperty("price")
-                                .withOperator(AggregateOperatorType.AVERAGE)
+                                .withOperator(AggregationAccumulatorOperatorType.AVERAGE)
                                 .build()
                         )
                     )

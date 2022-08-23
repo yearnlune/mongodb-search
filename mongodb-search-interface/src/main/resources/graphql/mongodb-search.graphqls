@@ -8,10 +8,15 @@ enum SearchOperatorType {
     BETWEEN
 }
 
-enum AggregateOperatorType {
+enum AggregationAccumulatorOperatorType {
     COUNT
     SUM
     AVERAGE
+}
+
+enum ComparisonOperatorType {
+    EQUAL
+    REGEX_MATCH
 }
 
 enum PropertyType {
@@ -24,6 +29,7 @@ enum PropertyType {
     DATE
     STRING
     OBJECT_ID
+    PROPERTY
     CURRENCY
     IMAGE
     ENUM
@@ -59,6 +65,11 @@ enum ColorPaletteType {
     PASTEL
 }
 
+input DataInput {
+    value: String
+    type: PropertyType
+}
+
 input SortInput {
     property: String!
     isDescending: Boolean!
@@ -79,9 +90,15 @@ input PageInput {
 }
 
 input AggregationInput {
-    property: String!
-    operator: AggregateOperatorType!
+    property: String
+    propertyExpression: ConditionInput
+    operator: AggregationAccumulatorOperatorType!
     alias: String
+}
+
+input ConditionInput {
+    if: SearchInput!
+    then: DataInput!
 }
 
 input GroupByInput {
