@@ -14,9 +14,9 @@ fun MongoTemplate.dreamChart(chart: DreamChartInput): DreamChart {
     ).mappedResults
 
     val keys = results
-        .filter { it["_id"] != null }
         .map {
             when (val keyCandidate = it["_id"]) {
+                null -> "null"
                 is String -> keyCandidate
                 is Map<*, *> -> {
                     keyCandidate.keys.toList()
