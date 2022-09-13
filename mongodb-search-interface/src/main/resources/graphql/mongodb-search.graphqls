@@ -73,7 +73,7 @@ input DataInput {
 
 input SortInput {
     property: String!
-    isDescending: Boolean!
+    isDescending: Boolean! = false
 }
 
 input SearchInput {

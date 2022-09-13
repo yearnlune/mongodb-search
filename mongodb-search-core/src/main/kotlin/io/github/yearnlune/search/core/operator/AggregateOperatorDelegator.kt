@@ -62,7 +62,6 @@ class AggregateOperatorDelegator {
         return aggregateOperator.map {
             it.buildQuery(aggregationOperation)
         }
-//        return aggregateOperator.buildQuery(aggregationOperation)
     }
 
     private fun buildExpression(
