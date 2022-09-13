@@ -10,7 +10,6 @@ tasks {
     }
 }
 
-
 pluginBundle {
     val projectDescription: String by project
 

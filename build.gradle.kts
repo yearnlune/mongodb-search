@@ -39,64 +39,66 @@ subprojects {
 
     val projectDescription: String by project
 
-    val dokkaJavadoc by tasks.getting
+    if (!project.name.contains("plugin")) {
+        val dokkaJavadoc by tasks.getting
 
-    tasks.register<Zip>("dokkaZip") {
-        from("$buildDir/dokka/html")
-        dependsOn(dokkaJavadoc)
-    }
+        tasks.register<Zip>("dokkaZip") {
+            from("$buildDir/dokka/html")
+            dependsOn(dokkaJavadoc)
+        }
 
-    val dokkaJavadocJar by tasks.registering(Jar::class) {
-        archiveClassifier.set("javadoc")
-        from("$buildDir/dokka/html")
-        dependsOn(dokkaJavadoc)
-    }
+        val dokkaJavadocJar by tasks.registering(Jar::class) {
+            archiveClassifier.set("javadoc")
+            from("$buildDir/dokka/html")
+            dependsOn(dokkaJavadoc)
+        }
 
-    configure<PublishingExtension> {
-        publications {
-            create<MavenPublication>("mavenKtx") {
-                from(components["java"])
-                artifact(dokkaJavadocJar)
+        configure<PublishingExtension> {
+            publications {
+                create<MavenPublication>("mavenKtx") {
+                    from(components["java"])
+                    artifact(dokkaJavadocJar)
 
-                pom {
-                    name.set(project.name)
-                    description.set(projectDescription)
-                    url.set("https://github.com/yearnlune/mongodb-search")
-                    licenses {
-                        license {
-                            name.set("Apache License 2.0")
-                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-                    developers {
-                        developer {
-                            id.set("yearnlune")
-                            name.set("DONGHWAN KIM")
-                            email.set("kdhpopyoa@gmail.com")
-                        }
-                    }
-                    scm {
-                        connection.set("scm:git:https://github.com/yearnlune/mongodb-search.git")
-                        developerConnection.set("scm:git:ssh://git@github.com:yearnlune/mongodb-search.git")
+                    pom {
+                        name.set(project.name)
+                        description.set(projectDescription)
                         url.set("https://github.com/yearnlune/mongodb-search")
+                        licenses {
+                            license {
+                                name.set("Apache License 2.0")
+                                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                            }
+                        }
+                        developers {
+                            developer {
+                                id.set("yearnlune")
+                                name.set("DONGHWAN KIM")
+                                email.set("kdhpopyoa@gmail.com")
+                            }
+                        }
+                        scm {
+                            connection.set("scm:git:https://github.com/yearnlune/mongodb-search.git")
+                            developerConnection.set("scm:git:ssh://git@github.com:yearnlune/mongodb-search.git")
+                            url.set("https://github.com/yearnlune/mongodb-search")
+                        }
                     }
                 }
             }
-        }
-        repositories {
-            maven {
-                val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-                url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
-                configure<SigningExtension> {
-                    val signingKey: String? by project
-                    val signingPassword: String? by project
-                    useInMemoryPgpKeys(signingKey, signingPassword)
-                    sign(publications["mavenKtx"])
-                }
-                credentials {
-                    username = System.getenv("SONATYPE_USERNAME")
-                    password = System.getenv("SONATYPE_PASSWORD")
+            repositories {
+                maven {
+                    val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                    val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                    url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+                    configure<SigningExtension> {
+                        val signingKey: String? by project
+                        val signingPassword: String? by project
+                        useInMemoryPgpKeys(signingKey, signingPassword)
+                        sign(publications["mavenKtx"])
+                    }
+                    credentials {
+                        username = System.getenv("SONATYPE_USERNAME")
+                        password = System.getenv("SONATYPE_PASSWORD")
+                    }
                 }
             }
         }
