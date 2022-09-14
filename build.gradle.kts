@@ -30,16 +30,17 @@ allprojects {
 }
 
 subprojects {
+    apply(plugin = "kotlin")
     apply(plugin = "jacoco")
     apply(plugin = "org.jetbrains.dokka")
-    apply(plugin = "kotlin")
-    apply(plugin = "maven-publish")
-    apply(plugin = "signing")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     val projectDescription: String by project
 
     if (!project.name.contains("plugin")) {
+        apply(plugin = "signing")
+        apply(plugin = "maven-publish")
+
         val dokkaJavadoc by tasks.getting
 
         tasks.register<Zip>("dokkaZip") {

@@ -25,6 +25,7 @@ gradlePlugin {
         create("mongodbSearchPlugin") {
             id = "io.github.yearnlune.search.plugin"
             implementationClass = "io.github.yearnlune.search.plugin.MongoSearchPlugin"
+            displayName = "MongoDB Search plugin"
         }
     }
 }
