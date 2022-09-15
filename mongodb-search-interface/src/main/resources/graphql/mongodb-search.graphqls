@@ -3,6 +3,7 @@ scalar JSON
 
 enum SearchOperatorType {
     EQUAL
+    NOT_EQUAL
     CONTAIN
     START_WITH
     BETWEEN
@@ -17,6 +18,7 @@ enum AggregationAccumulatorOperatorType {
 
 enum ComparisonOperatorType {
     EQUAL
+    NOT_EQUAL
     REGEX_MATCH
 }
 

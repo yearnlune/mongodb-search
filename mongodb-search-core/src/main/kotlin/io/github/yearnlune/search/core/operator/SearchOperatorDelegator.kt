@@ -24,6 +24,7 @@ class SearchOperatorDelegator {
 
         searchOperator = when (searchInput.operator) {
             SearchOperatorType.EQUAL -> EqualOperator(searchBy, typedValues)
+            SearchOperatorType.NOT_EQUAL -> NotEqualOperator(searchBy, typedValues)
             SearchOperatorType.CONTAIN -> ContainOperator(searchBy, typedValues)
             SearchOperatorType.BETWEEN -> BetweenOperator(searchBy, typedValues)
             SearchOperatorType.START_WITH -> StartWithOperator(searchBy, typedValues)
