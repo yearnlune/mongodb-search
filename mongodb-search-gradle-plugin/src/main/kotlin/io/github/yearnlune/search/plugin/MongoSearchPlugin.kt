@@ -3,7 +3,7 @@ package io.github.yearnlune.search.plugin
 import io.github.yearnlune.search.plugin.BuildProperties.APPLY_MONGODB_SEARCH_TASK
 import io.github.yearnlune.search.plugin.BuildProperties.COPY_INTERFACE_TASK
 import io.github.yearnlune.search.plugin.BuildProperties.EXTRACT_INTERFACE_TASK
-import io.github.yearnlune.search.plugin.BuildProperties.OUTPUT_DIRECTORY
+import io.github.yearnlune.search.plugin.BuildProperties.OUTPUT_RESOURCE_DIRECTORY
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -42,8 +42,8 @@ class MongoSearchPlugin : Plugin<Project> {
     private fun registerCopyInterface(project: Project) {
         project.tasks.register(COPY_INTERFACE_TASK, CopyMongodbSearchInterface::class.java)
         project.getTasksByName(COPY_INTERFACE_TASK, false)
-            .forEach {
-                it.dependsOn(EXTRACT_INTERFACE_TASK)
+            .forEach { copyTask ->
+                copyTask.dependsOn(EXTRACT_INTERFACE_TASK)
             }
 
         project.plugins.apply(JavaPlugin::class.java)
@@ -54,6 +54,8 @@ class MongoSearchPlugin : Plugin<Project> {
         project.getTasksByName(APPLY_MONGODB_SEARCH_TASK, false)
             .forEach {
                 it.dependsOn(COPY_INTERFACE_TASK)
+                project.getTasksByName("compileJava", false)
+                    .map { task -> task.dependsOn(it.path) }
             }
 
         project.plugins.apply(JavaPlugin::class.java)
@@ -63,7 +65,7 @@ class MongoSearchPlugin : Plugin<Project> {
         (project.extensions.getByName("sourceSets") as SourceSetContainer)
             .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
             .resources {
-                val resourceDir = File(Paths.get(project.rootDir.path, OUTPUT_DIRECTORY, "graphql").toUri())
+                val resourceDir = File(Paths.get(project.buildDir.path, OUTPUT_RESOURCE_DIRECTORY).toUri())
                 it.srcDirs(resourceDir)
             }
     }

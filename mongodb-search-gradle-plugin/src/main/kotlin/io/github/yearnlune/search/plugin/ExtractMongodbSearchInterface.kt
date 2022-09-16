@@ -15,7 +15,7 @@ open class ExtractMongodbSearchInterface : CommonTask() {
         getImplementationFileTree()
             .filter { it.name.startsWith(BuildProperties.INTERFACE_NAME) }
             .map {
-                val outputDir = getAbsolutePath(BuildProperties.OUTPUT_DIRECTORY)
+                val outputDir = getAbsoluteBuildPath(BuildProperties.OUTPUT_DIRECTORY)
                 unzipTo(File(outputDir), it)
             }
     }

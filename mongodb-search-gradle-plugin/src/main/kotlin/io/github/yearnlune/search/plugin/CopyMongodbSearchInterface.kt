@@ -1,22 +1,32 @@
 package io.github.yearnlune.search.plugin
 
-import io.github.yearnlune.search.plugin.BuildProperties.GRAPHQL_SCHEMA_FILE_NAME
-import io.github.yearnlune.search.plugin.BuildProperties.OUTPUT_SCHEMA_FILE
-import io.github.yearnlune.search.plugin.BuildProperties.TARGET_RESOURCES_DIRECTORY
+import io.github.yearnlune.search.plugin.BuildProperties.EXTRACTED_GRAPHQL_DIRECTORY
+import io.github.yearnlune.search.plugin.BuildProperties.OUTPUT_GRAPHQL_RESOURCE_DIRECTORY
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-import java.nio.file.Paths
 
 open class CopyMongodbSearchInterface : CommonTask() {
 
     @TaskAction
     fun execute() {
-        val targetResourceDirectory = getAbsolutePath(TARGET_RESOURCES_DIRECTORY)
-        val mongodbSearchSchema = File(getAbsolutePath(OUTPUT_SCHEMA_FILE))
+        val extractedGraphqlDirectory = File(getAbsoluteBuildPath(EXTRACTED_GRAPHQL_DIRECTORY))
 
-        if (mongodbSearchSchema.isFile) {
-            val targetGraphqlSchema = File(Paths.get(targetResourceDirectory, GRAPHQL_SCHEMA_FILE_NAME).toUri())
-            mongodbSearchSchema.copyTo(targetGraphqlSchema, true)
+        runCatching {
+            val outputResourcesDirectory = makeOutputResourcesDirectory()
+            if (extractedGraphqlDirectory.isDirectory) {
+                extractedGraphqlDirectory.copyRecursively(outputResourcesDirectory, true)
+            } else {
+                throw RuntimeException("NOT FOUND EXTRACTED GRAPHQL DIRECTORY ${extractedGraphqlDirectory.path}")
+            }
+        }.onSuccess {
+            removeDirectory(extractedGraphqlDirectory)
+        }.onFailure {
+            it.stackTrace
         }
     }
+
+    private fun makeOutputResourcesDirectory(): File =
+        File(getAbsoluteBuildPath(OUTPUT_GRAPHQL_RESOURCE_DIRECTORY)).also { it.mkdirs() }
+
+    private fun removeDirectory(directory: File) = directory.deleteRecursively()
 }

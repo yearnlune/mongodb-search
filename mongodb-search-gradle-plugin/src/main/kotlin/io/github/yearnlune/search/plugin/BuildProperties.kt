@@ -10,11 +10,11 @@ object BuildProperties {
 
     const val APPLY_MONGODB_SEARCH_TASK = "applyMongodbSearch"
 
-    const val GRAPHQL_SCHEMA_FILE_NAME = "mongodb-search.graphqls"
+    const val OUTPUT_DIRECTORY = "generated/resources/mongodbSearch"
 
-    const val OUTPUT_DIRECTORY = "build/generated/resources/mongodbSearch"
+    const val OUTPUT_RESOURCE_DIRECTORY = "$OUTPUT_DIRECTORY/resources"
 
-    const val OUTPUT_SCHEMA_FILE = "$OUTPUT_DIRECTORY/graphql/$GRAPHQL_SCHEMA_FILE_NAME"
+    const val OUTPUT_GRAPHQL_RESOURCE_DIRECTORY = "$OUTPUT_RESOURCE_DIRECTORY/graphql"
 
-    const val TARGET_RESOURCES_DIRECTORY = "build/resources/main/graphql"
+    const val EXTRACTED_GRAPHQL_DIRECTORY = "$OUTPUT_DIRECTORY/graphql"
 }

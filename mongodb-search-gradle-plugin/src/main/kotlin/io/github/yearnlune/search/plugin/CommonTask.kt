@@ -5,7 +5,7 @@ import java.nio.file.Paths
 
 open class CommonTask : DefaultTask() {
 
-    protected fun getAbsolutePath(path: String): String = Paths.get(getRootDir(), path).toString()
+    protected fun getAbsoluteBuildPath(path: String): String = Paths.get(getBuildDir(), path).toString()
 
-    private fun getRootDir(): String = super.getProject().rootDir.path
+    private fun getBuildDir(): String = super.getProject().buildDir.path
 }
