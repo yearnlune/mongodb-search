@@ -1,5 +1,6 @@
 package io.github.yearnlune.search.core.operator
 
+import io.github.yearnlune.search.core.exception.NotSupportedExpressionException
 import io.github.yearnlune.search.core.extension.toMongoType
 import io.github.yearnlune.search.graphql.ComparisonOperatorType
 import io.github.yearnlune.search.graphql.DataInput
@@ -17,9 +18,10 @@ class ConditionOperator(
     fun buildExpression(): AggregationExpression {
         return ConditionalOperators.Cond.`when`(
             SearchOperatorDelegator().create(`if`, Any::class.java).buildExpression(getOperatorType())
-        )
-            .then(then.value.toMongoType(then.type))
-            .otherwiseValueOf("nullField")
+        ).run {
+            then.value?.let { this.then(it.toMongoType(then.type)) } ?: then.fieldReference?.let { this.thenValueOf(it) }
+        }?.otherwiseValueOf("nullField")
+            ?: throw NotSupportedExpressionException("COULD NOT BUILD \$COND")
     }
 
     private fun getOperatorType(): ComparisonOperatorType? {

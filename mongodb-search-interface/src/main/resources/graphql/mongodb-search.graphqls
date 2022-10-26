@@ -70,6 +70,7 @@ enum ColorPaletteType {
 
 input DataInput {
     value: String
+    fieldReference: String
     type: PropertyType
 }
 
