@@ -160,3 +160,29 @@ type DreamChartDataset {
     label: String!
     data: [Long]!
 }
+
+type DreamChartMeta {
+    title: String!
+    description: String
+    type: ChartType!
+    colorPalette: ColorPaletteType!
+    valueType: ChartValueType!
+    datasetMeta: DreamChartDatasetMeta!
+}
+
+type DreamChartDatasetMeta {
+    collection: String!
+    statistic: Statistic!
+}
+
+type Statistic {
+    searches: [Search]!,
+    aggregates: [JSON]!
+}
+
+type Search {
+    by: String!
+    type: PropertyType!
+    operator: SearchOperatorType!
+    value: [String!]!
+}

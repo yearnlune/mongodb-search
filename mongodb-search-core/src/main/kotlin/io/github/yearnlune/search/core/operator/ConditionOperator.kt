@@ -19,7 +19,8 @@ class ConditionOperator(
         return ConditionalOperators.Cond.`when`(
             SearchOperatorDelegator().create(`if`, Any::class.java).buildExpression(getOperatorType())
         ).run {
-            then.value?.let { this.then(it.toMongoType(then.type)) } ?: then.fieldReference?.let { this.thenValueOf(it) }
+            then.value?.let { this.then(it.toMongoType(then.type)) }
+                ?: then.fieldReference?.let { this.thenValueOf(it) }
         }?.otherwiseValueOf("nullField")
             ?: throw NotSupportedExpressionException("COULD NOT BUILD \$COND")
     }
