@@ -12,7 +12,7 @@ class SumOperator(
 
     override val finalAlias: String by lazy { alias ?: "${propertyPath}_sum" }
 
-    override fun validate(): Boolean = (propertyPath != null && propertyPath.isNotBlank()) || propertyExpression != null
+    override fun validate(): Boolean = !propertyPath.isNullOrBlank() || propertyExpression != null
 
     override fun buildOperation(aggregationOperation: AggregationOperation?): AggregationOperation {
         return when (aggregationOperation) {

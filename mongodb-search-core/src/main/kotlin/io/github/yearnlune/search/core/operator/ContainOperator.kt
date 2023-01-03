@@ -1,8 +1,6 @@
 package io.github.yearnlune.search.core.operator
 
-import io.github.yearnlune.search.core.exception.NotSupportedExpressionException
 import io.github.yearnlune.search.core.extension.escapeSpecialRegexChars
-import io.github.yearnlune.search.graphql.ComparisonOperatorType
 import org.springframework.data.mongodb.core.aggregation.AggregationExpression
 import org.springframework.data.mongodb.core.aggregation.StringOperators
 import org.springframework.data.mongodb.core.query.Criteria
@@ -20,15 +18,11 @@ class ContainOperator(
         )
     )
 
-    override fun buildExpression(operatorType: Any?): AggregationExpression {
-        return when (operatorType) {
-            ComparisonOperatorType.REGEX_MATCH ->
-                StringOperators.RegexMatch
-                    .valueOf(searchBy)
-                    .regex(convertRegex())
-                    .options("ui")
-            else -> throw NotSupportedExpressionException("")
-        }
+    override fun buildExpression(): AggregationExpression {
+        return StringOperators.RegexMatch
+            .valueOf(searchBy)
+            .regex(convertRegex())
+            .options("ui")
     }
 
     private fun convertRegex(): String {

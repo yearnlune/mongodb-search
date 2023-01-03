@@ -1,7 +1,6 @@
 package io.github.yearnlune.search.core.extension
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.github.yearnlune.search.core.exception.NotFoundFieldException
 import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
 import io.github.yearnlune.search.graphql.CountAggregationInput
 import io.github.yearnlune.search.graphql.GroupAggregationInput
@@ -9,7 +8,6 @@ import io.github.yearnlune.search.graphql.LimitAggregationInput
 import io.github.yearnlune.search.graphql.PropertyType
 import io.github.yearnlune.search.graphql.SortAggregationInput
 import org.bson.types.ObjectId
-import java.lang.reflect.Field
 import java.util.regex.Pattern
 import kotlin.math.floor
 
@@ -17,29 +15,6 @@ fun String.snakeCase(): String {
     return "(?<=[a-zA-Z])[A-Z]".toRegex().replace(this) {
         "_${it.value}"
     }.lowercase()
-}
-
-fun <T> Class<T>.getFieldPath(fieldName: String, snakeCase: Boolean = false): String {
-    val name = if (snakeCase) fieldName.snakeCase() else fieldName
-    val fields = this.getAllFields()
-        .associateBy { if (snakeCase) it.name.snakeCase() else it.name }
-
-    return if (fields.containsKey(name)) {
-        name
-    } else {
-        throw NotFoundFieldException("Not found field: '$name' at [${this.simpleName}]")
-    }
-}
-
-fun <T> Class<T>.getAllFields(): MutableList<Field> {
-    val fields: MutableList<Field> = this.declaredFields.toMutableList().filter { !it.isSynthetic }.toMutableList()
-
-    if (this.superclass != null) {
-        val superClassFields = this.superclass.getAllFields()
-        fields.addAll(superClassFields)
-    }
-
-    return fields
 }
 
 @kotlin.jvm.Throws(NumberFormatException::class, IllegalArgumentException::class)

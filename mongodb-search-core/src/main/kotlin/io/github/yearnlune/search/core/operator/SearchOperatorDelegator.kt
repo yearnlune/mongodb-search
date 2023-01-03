@@ -37,7 +37,7 @@ class SearchOperatorDelegator {
 
     fun buildQuery(criteria: Criteria? = null): Criteria = searchOperator.buildQuery(criteria)
 
-    fun buildExpression(operatorType: Any?): AggregationExpression = searchOperator.buildExpression(operatorType)
+    fun buildExpression(): AggregationExpression = searchOperator.buildExpression()
 
     fun buildAggregation(): Aggregation = Aggregation.newAggregation(buildMatchOperation())
 

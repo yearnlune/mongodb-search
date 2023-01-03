@@ -1,29 +1,19 @@
 package io.github.yearnlune.search.core.extension
 
-import io.github.yearnlune.search.core.domain.Product
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
+import io.github.yearnlune.search.graphql.CountAggregationInput
+import io.github.yearnlune.search.graphql.GroupAggregationInput
+import io.github.yearnlune.search.graphql.GroupByInput
 import io.github.yearnlune.search.graphql.PropertyType
+import io.github.yearnlune.search.graphql.StatisticInput
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeTypeOf
 import org.bson.types.ObjectId
 
 class CommonExtensionTest : DescribeSpec({
-
-    describe("getAllFields") {
-        context("객체의 필드 목록을 가져올 때") {
-            it("상속받은 객체의 필드 또한 가져온다.") {
-                Product::class.java.getAllFields().map { it.name } shouldBe mutableListOf(
-                    "name",
-                    "category",
-                    "price",
-                    "stockQuantity",
-                    "id",
-                    "updatedAt",
-                    "deleted"
-                )
-            }
-        }
-    }
 
     describe("snakeCase") {
         context("camelcase를 변환할 때") {
@@ -105,6 +95,35 @@ class CommonExtensionTest : DescribeSpec({
                         "IllegalArgument".toMongoType(PropertyType.OBJECT_ID)
                     }
                 }
+            }
+        }
+    }
+
+    describe("toAggregationInput") {
+        context("Map의 데이터에 따라") {
+            it("GroupAggregationInput으로 반환한다.") {
+                val map = jacksonObjectMapper().convertValue(
+                    GroupAggregationInput.builder().withBy(listOf(GroupByInput.builder().build())).build(),
+                    Map::class.java
+                )
+                map.toAggregationInput().shouldBeTypeOf<GroupAggregationInput>()
+            }
+
+            it("CountAggregationInput으로 반환한다.") {
+                val map = jacksonObjectMapper().convertValue(
+                    CountAggregationInput.builder().build(),
+                    Map::class.java
+                )
+                map.toAggregationInput().shouldBeTypeOf<CountAggregationInput>()
+            }
+
+            it("NotSupportedOperatorException 예외를 반환한다.") {
+                val map = jacksonObjectMapper().convertValue(
+                    StatisticInput.builder().build(),
+                    Map::class.java
+                )
+
+                shouldThrow<NotSupportedOperatorException> { map.toAggregationInput() }
             }
         }
     }

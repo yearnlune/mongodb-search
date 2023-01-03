@@ -3,7 +3,6 @@ package io.github.yearnlune.search.core.extension
 import io.github.yearnlune.search.core.operator.AggregateOperatorDelegator
 import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
 import io.github.yearnlune.search.graphql.SearchInput
-import io.github.yearnlune.search.graphql.StatisticInput
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.Fields
@@ -41,13 +40,6 @@ fun Aggregation.aggregate(aggregates: List<Any>, targetClass: Class<*>): Aggrega
     }
 
     return Aggregation.newAggregation(operations)
-}
-
-fun Aggregation.statistic(statistics: StatisticInput, targetClass: Class<*>): Aggregation {
-    this.search(statistics.searches, targetClass)
-    this.aggregate(statistics.aggregates, targetClass)
-
-    return this
 }
 
 fun List<String>.toMongoFields(): Fields {

@@ -12,12 +12,12 @@ abstract class SearchOperator(
 
     abstract fun appendExpression(criteria: Criteria): Criteria
 
+    abstract fun buildExpression(): AggregationExpression
+
     fun buildQuery(criteria: Criteria? = null): Criteria {
         val searchCriteria = initializeCriteriaWithTarget(criteria)
         return appendExpression(searchCriteria)
     }
-
-    abstract fun buildExpression(operatorType: Any?): AggregationExpression
 
     private fun initializeCriteriaWithTarget(criteria: Criteria? = null): Criteria {
         return criteria?.and(searchBy) ?: Criteria.where(searchBy)
