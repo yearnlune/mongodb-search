@@ -23,9 +23,9 @@ class BetweenOperatorTest : DescribeSpec({
                     BetweenOperator(searchBy, listOf(start.toObjectId(), end.toObjectId())).buildQuery()
                 val expectedQuery =
                     "{ \"$searchBy\" : " +
-                        "{ \"\$gte\" : { \"\$oid\" : \"${start.toObjectId()}\"}, " +
-                        "\"\$lt\" : { \"\$oid\" : \"${end.toObjectId()}\"}}" +
-                        "}"
+                            "{ \"\$gte\" : { \"\$oid\" : \"${start.toObjectId()}\"}, " +
+                            "\"\$lt\" : { \"\$oid\" : \"${end.toObjectId()}\"}}" +
+                            "}"
 
                 SerializationUtils.serializeToJsonSafely(Query(betweenQuery).queryObject) shouldBe expectedQuery
             }

@@ -3,6 +3,8 @@ package io.github.yearnlune.search.core.operator
 import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
 import io.github.yearnlune.search.core.extension.snakeCase
 import io.github.yearnlune.search.core.extension.toMongoType
+import io.github.yearnlune.search.core.type.ReservedWordType
+import io.github.yearnlune.search.graphql.PropertyType
 import io.github.yearnlune.search.graphql.SearchInput
 import io.github.yearnlune.search.graphql.SearchOperatorType
 import org.springframework.data.mongodb.core.aggregation.Aggregation
@@ -20,7 +22,9 @@ class SearchOperatorDelegator {
         targetClass: Class<T>,
     ): SearchOperatorDelegator {
         val searchBy = searchInput.by.snakeCase()
-        val typedValues = searchInput.value.map { value -> value.toMongoType(searchInput.type) }
+        val typedValues = searchInput.value
+            .map { processReservedWord(it, searchInput.type) }
+            .map { it.toMongoType(searchInput.type) }
 
         searchOperator = when (searchInput.operator) {
             SearchOperatorType.EQUAL -> EqualOperator(searchBy, typedValues)
@@ -46,4 +50,10 @@ class SearchOperatorDelegator {
     fun buildAggregation(): Aggregation = Aggregation.newAggregation(buildMatchOperation())
 
     private fun buildMatchOperation(): AggregationOperation = MatchOperation(searchOperator.buildQuery())
+
+    private fun processReservedWord(value: String, type: PropertyType): String {
+        return runCatching {
+            ReservedWordType.fromValue(value).process(type)
+        }.getOrDefault(value)
+    }
 }

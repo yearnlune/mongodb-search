@@ -1,11 +1,13 @@
 package io.github.yearnlune.search.core.extension
 
 import io.github.yearnlune.search.core.domain.Product
+import io.github.yearnlune.search.core.type.ReservedWordType
 import io.github.yearnlune.search.graphql.PropertyType
 import io.github.yearnlune.search.graphql.SearchInput
 import io.github.yearnlune.search.graphql.SearchOperatorType
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -22,7 +24,7 @@ class QueryExtensionSearchTest : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                    "{ \"name\" : { \"\$in\" : [\"사과\"]}}"
+                        "{ \"name\" : { \"\$in\" : [\"사과\"]}}"
             }
 
             it("검색어가 여러 개 일 때") {
@@ -53,7 +55,7 @@ class QueryExtensionSearchTest : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                    "{ \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}"
+                        "{ \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}"
             }
 
             it("objectId 타입일 때") {
@@ -63,7 +65,18 @@ class QueryExtensionSearchTest : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                    "{ \"id\" : { \"\$gte\" : { \"\$oid\" : \"62cf86870000000000000000\"}, \"\$lt\" : { \"\$oid\" : \"62cf86880000000000000000\"}}}"
+                        "{ \"id\" : { \"\$gte\" : { \"\$oid\" : \"62cf86870000000000000000\"}, \"\$lt\" : { \"\$oid\" : \"62cf86880000000000000000\"}}}"
+            }
+
+            it("현재시각으로 검색 할 때") {
+                val start = ReservedWordType.CURRENT_DATE.name
+                val searchInput: SearchInput = SearchInput.builder().withBy("updated_at").withType(PropertyType.DATE)
+                    .withValue(listOf(start, "1738291115000")).withOperator(SearchOperatorType.BETWEEN).build()
+
+                val criteria = Criteria().search(listOf(searchInput), Product::class.java)
+
+                SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldContain
+                        """\{ "updated_at" : \{ "\$\w{3}" : \d{13}""".toRegex()
             }
         }
 
@@ -80,7 +93,7 @@ class QueryExtensionSearchTest : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Any::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                    "{ \"$property\" : { \"\$regularExpression\" : { \"pattern\" : \"^192\\\\.168\\\\.12\", \"options\" : \"iu\"}}}"
+                        "{ \"$property\" : { \"\$regularExpression\" : { \"pattern\" : \"^192\\\\.168\\\\.12\", \"options\" : \"iu\"}}}"
             }
         }
 
@@ -99,7 +112,7 @@ class QueryExtensionSearchTest : DescribeSpec({
                         Aggregation.match(Criteria.where("deleted").exists(false))
                     ).search(searches, Product::class.java).toPipeline(Aggregation.DEFAULT_CONTEXT)
                 ) shouldBe "[{ \"\$match\" : { \"deleted\" : { \"\$exists\" : false}}}, " +
-                    "{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}}]"
+                        "{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}}]"
             }
         }
     }
