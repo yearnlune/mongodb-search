@@ -162,7 +162,7 @@ type DreamChart {
 
 type DreamChartDataset {
     label: String!
-    data: [Long]!
+    data: [Float]!
 }
 
 type DreamChartMeta {
