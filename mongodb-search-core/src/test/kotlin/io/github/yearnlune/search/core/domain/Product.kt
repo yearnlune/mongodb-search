@@ -4,5 +4,6 @@ data class Product(
     val name: String,
     val category: Long,
     val price: Double,
-    val stockQuantity: Long
+    val stockQuantity: Long,
+    val tags: List<String>
 ) : Base()

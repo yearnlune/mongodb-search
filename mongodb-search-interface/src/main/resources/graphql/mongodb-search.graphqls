@@ -146,6 +146,10 @@ input SortAggregationInput {
     sorts: [SortInput]! = []
 }
 
+input UnwindAggregationInput {
+    by: String
+}
+
 input StatisticInput {
     searches: [SearchInput]! = [],
     aggregates: [JSON]! = []

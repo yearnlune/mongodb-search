@@ -19,6 +19,7 @@ import io.github.yearnlune.search.graphql.SearchOperatorType
 import io.github.yearnlune.search.graphql.SortAggregationInput
 import io.github.yearnlune.search.graphql.SortInput
 import io.github.yearnlune.search.graphql.StatisticInput
+import io.github.yearnlune.search.graphql.UnwindAggregationInput
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -540,6 +541,29 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         Product::class.java
                     ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                 ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$sort\" : { \"name\" : 1, \"price\" : -1}}]"
+            }
+        }
+
+        context("unwind") {
+            it("d ") {
+                val searchInput: SearchInput = SearchInput.builder()
+                    .withBy("name")
+                    .withType(PropertyType.STRING)
+                    .withValue(listOf("사과", "바나나", "세제"))
+                    .withOperator(SearchOperatorType.EQUAL).build()
+                val unwindAggregation = UnwindAggregationInput.builder()
+                    .withBy("tags")
+                    .build()
+
+                SerializationUtils.serializeToJsonSafely(
+                    MongoSearch.statistic(
+                        StatisticInput.builder()
+                            .withSearches(listOf(searchInput))
+                            .withAggregates(listOf(unwindAggregation))
+                            .build(),
+                        Product::class.java
+                    ).toPipeline(Aggregation.DEFAULT_CONTEXT)
+                ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$unwind\" : \"\$tags\"}]"
             }
         }
     }
