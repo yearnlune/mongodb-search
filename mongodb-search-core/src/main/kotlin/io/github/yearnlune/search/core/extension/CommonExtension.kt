@@ -27,6 +27,7 @@ fun String.toMongoType(type: PropertyType): Any {
         PropertyType.NUMBER -> this.toDouble()
         PropertyType.BOOLEAN -> this.toBoolean()
         PropertyType.DATE -> this.toLong()
+        PropertyType.TIMESTAMP -> this.toLong()
         PropertyType.OBJECT_ID -> try {
             this.toLong().toObjectId()
         } catch (_: NumberFormatException) {

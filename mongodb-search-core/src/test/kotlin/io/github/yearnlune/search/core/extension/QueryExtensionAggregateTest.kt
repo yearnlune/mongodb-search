@@ -482,34 +482,64 @@ class QueryExtensionAggregateTest : DescribeSpec({
         }
 
         context("sort") {
-            context("데이터를 정렬 할 때") {
-                it("\$sort 를 사용한다") {
-                    val searchInput: SearchInput = SearchInput.builder()
-                        .withBy("name")
-                        .withType(PropertyType.STRING)
-                        .withValue(listOf("사과", "바나나", "세제"))
-                        .withOperator(SearchOperatorType.EQUAL).build()
-                    val sortAggregation = SortAggregationInput.builder()
-                        .withSorts(
-                            listOf(
-                                SortInput.builder()
-                                    .withProperty("name")
-                                    .withIsDescending(false)
-                                    .build()
-                            )
+            it("하나를 정렬할 때 \$sort 를 사용한다") {
+                val searchInput: SearchInput = SearchInput.builder()
+                    .withBy("name")
+                    .withType(PropertyType.STRING)
+                    .withValue(listOf("사과", "바나나", "세제"))
+                    .withOperator(SearchOperatorType.EQUAL).build()
+                val sortAggregation = SortAggregationInput.builder()
+                    .withSorts(
+                        listOf(
+                            SortInput.builder()
+                                .withProperty("name")
+                                .withIsDescending(false)
+                                .build()
                         )
-                        .build()
+                    )
+                    .build()
 
-                    SerializationUtils.serializeToJsonSafely(
-                        MongoSearch.statistic(
-                            StatisticInput.builder()
-                                .withSearches(listOf(searchInput))
-                                .withAggregates(listOf(sortAggregation))
+                SerializationUtils.serializeToJsonSafely(
+                    MongoSearch.statistic(
+                        StatisticInput.builder()
+                            .withSearches(listOf(searchInput))
+                            .withAggregates(listOf(sortAggregation))
+                            .build(),
+                        Product::class.java
+                    ).toPipeline(Aggregation.DEFAULT_CONTEXT)
+                ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$sort\" : { \"name\" : 1}}]"
+            }
+
+            it("두개 이상을 정렬할 때 \$sort 를 사용한다") {
+                val searchInput: SearchInput = SearchInput.builder()
+                    .withBy("name")
+                    .withType(PropertyType.STRING)
+                    .withValue(listOf("사과", "바나나", "세제"))
+                    .withOperator(SearchOperatorType.EQUAL).build()
+                val sortAggregation = SortAggregationInput.builder()
+                    .withSorts(
+                        listOf(
+                            SortInput.builder()
+                                .withProperty("name")
+                                .withIsDescending(false)
                                 .build(),
-                            Product::class.java
-                        ).toPipeline(Aggregation.DEFAULT_CONTEXT)
-                    ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$sort\" : { \"name\" : 1}}]"
-                }
+                            SortInput.builder()
+                                .withProperty("price")
+                                .withIsDescending(true)
+                                .build()
+                        )
+                    )
+                    .build()
+
+                SerializationUtils.serializeToJsonSafely(
+                    MongoSearch.statistic(
+                        StatisticInput.builder()
+                            .withSearches(listOf(searchInput))
+                            .withAggregates(listOf(sortAggregation))
+                            .build(),
+                        Product::class.java
+                    ).toPipeline(Aggregation.DEFAULT_CONTEXT)
+                ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$sort\" : { \"name\" : 1, \"price\" : -1}}]"
             }
         }
     }

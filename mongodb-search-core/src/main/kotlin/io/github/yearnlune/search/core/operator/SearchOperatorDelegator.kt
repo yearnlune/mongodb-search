@@ -37,6 +37,10 @@ class SearchOperatorDelegator {
             SearchOperatorType.LESS_THAN -> LessThanOperator(searchBy, typedValues)
             SearchOperatorType.GREATER_THAN_EQUAL -> GreaterThanEqualOperator(searchBy, typedValues)
             SearchOperatorType.GREATER_THAN -> GreaterThanOperator(searchBy, typedValues)
+            SearchOperatorType.DATE_RANGE -> DateRangeOperator(
+                searchBy,
+                typedValues.filterIsInstance(String::class.java)
+            )
             else -> throw NotSupportedOperatorException("Not supported operator: ${searchInput.operator.name}")
         }
 

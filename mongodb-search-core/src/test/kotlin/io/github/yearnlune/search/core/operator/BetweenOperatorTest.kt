@@ -23,9 +23,9 @@ class BetweenOperatorTest : DescribeSpec({
                     BetweenOperator(searchBy, listOf(start.toObjectId(), end.toObjectId())).buildQuery()
                 val expectedQuery =
                     "{ \"$searchBy\" : " +
-                            "{ \"\$gte\" : { \"\$oid\" : \"${start.toObjectId()}\"}, " +
-                            "\"\$lt\" : { \"\$oid\" : \"${end.toObjectId()}\"}}" +
-                            "}"
+                        "{ \"\$gte\" : { \"\$oid\" : \"${start.toObjectId()}\"}, " +
+                        "\"\$lt\" : { \"\$oid\" : \"${end.toObjectId()}\"}}" +
+                        "}"
 
                 SerializationUtils.serializeToJsonSafely(Query(betweenQuery).queryObject) shouldBe expectedQuery
             }
@@ -62,8 +62,8 @@ class BetweenOperatorTest : DescribeSpec({
                 val endDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(end), TimeZone.getDefault().toZoneId())
                     .format(DateTimeFormatter.ISO_DATE_TIME)
                 val betweenExpression = BetweenOperator(searchBy, listOf(startDate, endDate)).buildExpression()
-                val expectedQuery =
-                    " { \"\$and\" : [{ \"\$gte\" : [\"\$$searchBy\", \"$startDate\"]}, { \"\$lt\" : [\"\$$searchBy\", \"$endDate\"]}]}"
+                val expectedQuery = " { \"\$and\" : [{ \"\$gte\" : [\"\$$searchBy\", \"$startDate\"]}, " +
+                    "{ \"\$lt\" : [\"\$$searchBy\", \"$endDate\"]}]}"
 
                 betweenExpression.buildTestAggregation().toString() shouldContain expectedQuery
             }

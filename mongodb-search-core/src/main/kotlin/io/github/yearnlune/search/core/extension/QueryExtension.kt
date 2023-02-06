@@ -2,12 +2,15 @@ package io.github.yearnlune.search.core.extension
 
 import io.github.yearnlune.search.core.operator.AggregateOperatorDelegator
 import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
+import io.github.yearnlune.search.graphql.DateUnitType
 import io.github.yearnlune.search.graphql.SearchInput
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.Fields
 import org.springframework.data.mongodb.core.aggregation.MatchOperation
 import org.springframework.data.mongodb.core.query.Criteria
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
 
 fun Criteria.search(searches: List<SearchInput>, targetClass: Class<*>): Criteria {
     var newCriteria = this
@@ -50,4 +53,13 @@ fun List<String>.toMongoFields(): Fields {
     }
 
     return fields
+}
+
+fun DateUnitType.toTemporalType(): TemporalUnit {
+    return when (this) {
+        DateUnitType.DAYS -> ChronoUnit.DAYS
+        DateUnitType.MONTHS -> ChronoUnit.MONTHS
+        DateUnitType.WEEKS -> ChronoUnit.WEEKS
+        DateUnitType.YEARS -> ChronoUnit.YEARS
+    }
 }
