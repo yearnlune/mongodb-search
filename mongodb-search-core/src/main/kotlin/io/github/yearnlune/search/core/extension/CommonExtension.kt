@@ -30,7 +30,7 @@ fun String.toMongoType(type: PropertyType): Any {
         PropertyType.TIMESTAMP -> this.toLong()
         PropertyType.OBJECT_ID -> try {
             this.toLong().toObjectId()
-        } catch (_: NumberFormatException) {
+        } catch (_: Exception) {
             ObjectId(this)
         }
         PropertyType.CURRENCY -> this.toDouble()
@@ -38,7 +38,25 @@ fun String.toMongoType(type: PropertyType): Any {
     }
 }
 
-fun Long.toObjectId(): ObjectId = ObjectId(floor((this / 1000).toDouble()).toLong().toString(16) + "0000000000000000")
+fun Long.toObjectId() = ObjectId(floor((this / 1000).toDouble()).toLong().toString(16).rightPadding(24))
+
+fun String.rightPadding(size: Int, character: String = "0"): String {
+    var temp = this
+    while (temp.length < size) {
+        temp += character
+    }
+
+    return temp
+}
+
+fun String.leftPadding(size: Int, character: String = "0"): String {
+    var temp = this
+    while (temp.length < size) {
+        temp = character + temp
+    }
+
+    return temp
+}
 
 fun String.escapeSpecialRegexChars(): String =
     Pattern.compile("[{}()\\[\\].,+*?^$#\\\\|-]").matcher(this).replaceAll("\\\\$0")
