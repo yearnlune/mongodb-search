@@ -18,14 +18,13 @@ fun MongoTemplate.dreamChart(chart: DreamChartInput): DreamChart {
             when (val keyCandidate = it["_id"]) {
                 null -> "null"
                 is String -> keyCandidate
-                is Number -> keyCandidate.toString()
                 is Map<*, *> -> {
                     keyCandidate.keys.toList()
                         .sortedBy { k -> k as String }
                         .map { key -> keyCandidate[key] }
                         .joinToString("@")
                 }
-                else -> throw IllegalArgumentException()
+                else -> keyCandidate.toString()
             }
         }
     val values: MutableMap<String, MutableList<Double>> = mutableMapOf()
