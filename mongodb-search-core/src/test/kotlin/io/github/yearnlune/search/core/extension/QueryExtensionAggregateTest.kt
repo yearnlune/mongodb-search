@@ -23,6 +23,7 @@ import io.github.yearnlune.search.graphql.UnwindAggregationInput
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.query.SerializationUtils
 
@@ -428,6 +429,41 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             Product::class.java
                         )
                     }
+                }
+            }
+
+            context("필드의 존재여부로 나눌 경우") {
+                it("\$not을 활용하여 필드를 추가하여 쿼리 제공한다.") {
+                    val aggregates = SearchOperatorDelegator().create(
+                        SearchInput.builder()
+                            .withBy("name")
+                            .withType(PropertyType.STRING)
+                            .withValue(listOf("사과", "바나나", "세제"))
+                            .withOperator(SearchOperatorType.EQUAL)
+                            .build(),
+                        Product::class.java
+                    ).buildAggregation()
+                    val groupAggregation = GroupAggregationInput.builder()
+                        .withBy(
+                            listOf(
+                                GroupByInput.Builder()
+                                    .withKey("deleted")
+                                    .withOption(GroupByOptionType.EXISTS)
+                                    .build()
+                            )
+                        )
+                        .withAggregations(
+                            listOf(
+                                AggregationInput.builder()
+                                    .withOperator(AggregationAccumulatorOperatorType.COUNT)
+                                    .build()
+                            )
+                        )
+                        .build()
+                    SerializationUtils.serializeToJsonSafely(
+                        aggregates.aggregate(listOf(groupAggregation), Product::class.java)
+                            .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                    ) shouldContain "{ \"\$addFields\" : { \"deleted_4\" : { \"\$not\" : [{ \"\$not\" : [\"\$deleted\"]}]}}}, { \"\$group\" : { \"_id\" : \"\$deleted_4\", \"count\" : { \"\$sum\" : 1}}}]"
                 }
             }
         }

@@ -52,6 +52,7 @@ enum GroupByOptionType {
     WEEKLY
     MONTHLY
     YEARLY
+    EXISTS
 }
 
 enum ChartType {

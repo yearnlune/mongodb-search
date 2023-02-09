@@ -29,6 +29,20 @@ class AddFieldsOperator(
     }
 
     private fun addFields(addFieldOperation: AddFieldsOperation, field: Field): AddFieldsOperation {
+        return if (field.isDateOption()) {
+            addDateField(addFieldOperation, field)
+        } else {
+            when (field.option) {
+                GroupByOptionType.EXISTS -> addFieldOperation.addField(
+                    field.alias,
+                    ExistsOperator(field.key, listOf(true)).buildExpression()
+                )
+                else -> throw UnsupportedOperationException()
+            }
+        }
+    }
+
+    private fun addDateField(addFieldOperation: AddFieldsOperation, field: Field): AddFieldsOperation {
         val date = ConvertOperators.Convert.convertValueOf(field.key).to(JsonSchemaObject.Type.dateType())
         val format = when (field.option) {
             GroupByOptionType.DAILY -> "%Y%m%d"
@@ -44,5 +58,8 @@ class AddFieldsOperator(
         val key: String,
         val option: GroupByOptionType,
         val alias: String
-    )
+    ) {
+
+        fun isDateOption() = option !== GroupByOptionType.EXISTS
+    }
 }
