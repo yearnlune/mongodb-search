@@ -127,7 +127,13 @@ input ConditionInput {
 
 input GroupByInput {
     key: String!
-    option: GroupByOptionType
+    option: GroupByOptionType @deprecated(reason: "option is deprecated since v1.0.26, Use options instead.")
+    options: GroupByOptionInput
+}
+
+input GroupByOptionInput {
+    type: GroupByOptionType!
+    timezone: Int = 0
 }
 
 input GroupAggregationInput {
