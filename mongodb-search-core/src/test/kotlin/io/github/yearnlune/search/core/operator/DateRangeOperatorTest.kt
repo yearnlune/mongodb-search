@@ -57,7 +57,7 @@ class DateRangeOperatorTest : DescribeSpec({
     }
 
     describe("buildExpression") {
-        it("a") {
+        it("\$gte, \$lt query를 반환한다.") {
             val values = listOf("NEXT", "MONTHS", "3", "${nowInstance.toEpochMilli()}")
             val dateRangeExpression = DateRangeOperator(searchBy, values).buildExpression()
             val expectedQuery =

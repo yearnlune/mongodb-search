@@ -82,7 +82,7 @@ class CommonExtensionTest : DescribeSpec({
                     "5e90124f851ff61878689d5e".toMongoType(PropertyType.OBJECT_ID) shouldBe ObjectId("5e90124f851ff61878689d5e")
                 }
 
-                it("hexString 값을 가진 ObjectId를 반환한다.") {
+                it("0으로 이뤄진 hexString 값을 가진 ObjectId를 반환한다.") {
                     "000000000000000000000000".toMongoType(PropertyType.OBJECT_ID) shouldBe ObjectId("000000000000000000000000")
                 }
             }
