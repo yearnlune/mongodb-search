@@ -11,9 +11,9 @@ assignees: ''
 Describe your issue here.
 
 ### Your environment
-* version of angular-translate
-* version of angular
-* which browser and its version
+* version of mongo-search
+* version of jdk
+* version of spring
 
 ### Steps to reproduce
 Tell us how to reproduce this issue.
