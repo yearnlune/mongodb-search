@@ -11,6 +11,7 @@ import io.github.yearnlune.search.graphql.CountAggregationInput
 import io.github.yearnlune.search.graphql.DataInput
 import io.github.yearnlune.search.graphql.GroupAggregationInput
 import io.github.yearnlune.search.graphql.GroupByInput
+import io.github.yearnlune.search.graphql.GroupByOptionInput
 import io.github.yearnlune.search.graphql.GroupByOptionType
 import io.github.yearnlune.search.graphql.LimitAggregationInput
 import io.github.yearnlune.search.graphql.PropertyType
@@ -63,7 +64,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
                         ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, " +
-                            "{ \"\$group\" : { \"_id\" : \"\$category\", \"count\" : { \"\$sum\" : 1}}}]"
+                                "{ \"\$group\" : { \"_id\" : \"\$category\", \"count\" : { \"\$sum\" : 1}}}]"
                     }
                 }
             }
@@ -105,7 +106,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             )
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
                         ) shouldBe "[{ \"\$match\" : { \"price\" : { \"\$gte\" : 0.0, \"\$lt\" : 100.0}}}, " +
-                            "{ \"\$group\" : { \"_id\" : \"\$category\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                                "{ \"\$group\" : { \"_id\" : \"\$category\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
                     }
 
                     context("올바른 값이 아닐 때") {
@@ -177,7 +178,16 @@ class QueryExtensionAggregateTest : DescribeSpec({
                 }
 
                 context("특정 필드의 조건 그룹 별 총합을 구할 때") {
-                    it("\$group에서 \$sum을 사용한다.") {
+                    it("\$cond를 활용하여 조건을 적용하여 \$sum을 통해 총합을 구한다.") {
+                        val expectedQuery = "[{ \"\$match\" : { \"price\" : { \"\$gte\" : 0.0, \"\$lt\" : 100.0}}}, " +
+                                "{ \"\$addFields\" : { \"updated_at_2\" : { \"\$dateToString\" : " +
+                                "{ \"format\" : \"%Y%m\", \"date\" : { \"\$convert\" : { \"input\" : { \"\$add\" : " +
+                                "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : " +
+                                "{ \"input\" : \"\$updated_at\", \"to\" : \"date\"}}, " +
+                                "\"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}, " +
+                                "{ \"\$group\" : { \"_id\" : \"\$updated_at_2\", \"과일종류\" : " +
+                                "{ \"\$sum\" : { \"\$cond\" : { \"if\" : { \"\$eq\" : " +
+                                "[\"\$category\", \"fruit\"]}, \"then\" : 1, \"else\" : \"\$nullField\"}}}}}]"
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
@@ -219,12 +229,9 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             )
                             .build()
                         SerializationUtils.serializeToJsonSafely(
-                            aggregates.aggregate(
-                                listOf(groupAggregation),
-                                Product::class.java
-                            )
+                            aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
-                        ) shouldBe "[{ \"\$match\" : { \"price\" : { \"\$gte\" : 0.0, \"\$lt\" : 100.0}}}, { \"\$addFields\" : { \"updated_at_2\" : { \"\$dateToString\" : { \"format\" : \"%Y%m\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_2\", \"과일종류\" : { \"\$sum\" : { \"\$cond\" : { \"if\" : { \"\$eq\" : [\"\$category\", \"fruit\"]}, \"then\" : 1, \"else\" : \"\$nullField\"}}}}}]"
+                        ) shouldBe expectedQuery
                     }
                 }
             }
@@ -266,7 +273,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             )
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
                         ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : 1657854891000, \"\$lt\" : 1659150891000}}}, " +
-                            "{ \"\$group\" : { \"_id\" : \"\$category\", \"price_avg\" : { \"\$avg\" : \"\$price\"}}}]"
+                                "{ \"\$group\" : { \"_id\" : \"\$category\", \"price_avg\" : { \"\$avg\" : \"\$price\"}}}]"
                     }
                 }
             }
@@ -282,6 +289,10 @@ class QueryExtensionAggregateTest : DescribeSpec({
 
                 context("일별") {
                     it("일별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
+                        val expectedQuery = "{ \"\$addFields\" : { \"updated_at_0\" : { \"\$dateToString\" : " +
+                                "{ \"format\" : \"%Y%m%d\", \"date\" : { \"\$convert\" : { \"input\" : { \"\$add\" : " +
+                                "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
+                                "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}"
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
@@ -306,12 +317,16 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
-                        ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : $start, \"\$lt\" : $end}}}, { \"\$addFields\" : { \"updated_at_0\" : { \"\$dateToString\" : { \"format\" : \"%Y%m%d\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_0\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                        ) shouldContain expectedQuery
                     }
                 }
 
                 context("주별") {
                     it("주별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
+                        val expectedQuery = "{ \"\$addFields\" : { \"updated_at_1\" : { \"\$dateToString\" : " +
+                                "{ \"format\" : \"%Y%V\", \"date\" : { \"\$convert\" : { \"input\" : { \"\$add\" : " +
+                                "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
+                                "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}"
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
@@ -336,12 +351,16 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
-                        ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : $start, \"\$lt\" : $end}}}, { \"\$addFields\" : { \"updated_at_1\" : { \"\$dateToString\" : { \"format\" : \"%Y%V\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_1\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                        ) shouldContain expectedQuery
                     }
                 }
 
                 context("월별") {
                     it("월별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
+                        val expectedQuery = "{ \"\$addFields\" : { \"updated_at_2\" : { \"\$dateToString\" : " +
+                                "{ \"format\" : \"%Y%m\", \"date\" : { \"\$convert\" : { \"input\" : { \"\$add\" : " +
+                                "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
+                                "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}"
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
@@ -366,12 +385,16 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
-                        ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : $start, \"\$lt\" : $end}}}, { \"\$addFields\" : { \"updated_at_2\" : { \"\$dateToString\" : { \"format\" : \"%Y%m\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_2\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                        ) shouldContain expectedQuery
                     }
                 }
 
                 context("연도별") {
                     it("연도별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
+                        val expectedQuery = "{ \"\$addFields\" : { \"updated_at_3\" : { \"\$dateToString\" : " +
+                                "{ \"format\" : \"%Y\", \"date\" : { \"\$convert\" : { \"input\" : { \"\$add\" : " +
+                                "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
+                                "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}"
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
@@ -385,8 +408,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 )
                             )
                             .withAggregations(
-                                listOf(
-                                    AggregationInput.builder()
+                                listOf(AggregationInput.builder()
                                         .withProperty("stockQuantity")
                                         .withOperator(AggregationAccumulatorOperatorType.SUM)
                                         .build()
@@ -396,8 +418,45 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
-                        ) shouldBe "[{ \"\$match\" : { \"updated_at\" : { \"\$gte\" : $start, \"\$lt\" : $end}}}, { \"\$addFields\" : { \"updated_at_3\" : { \"\$dateToString\" : { \"format\" : \"%Y\", \"date\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", \"to\" : \"date\"}}}}}}, { \"\$group\" : { \"_id\" : \"\$updated_at_3\", \"stock_quantity_sum\" : { \"\$sum\" : \"\$stock_quantity\"}}}]"
+                        ) shouldContain expectedQuery
                     }
+                }
+
+                it("timezone을 적용할 경우") {
+                    val expectedQuery = "{ \"\$addFields\" : { \"updated_at_0\" : { \"\$dateToString\" : " +
+                            "{ \"format\" : \"%Y%m%d\", \"date\" : { \"\$convert\" : { \"input\" : { \"\$add\" : " +
+                            "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
+                            "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 32400]}, \"to\" : \"date\"}}}}}}"
+                    val aggregates = SearchOperatorDelegator()
+                        .create(searchInput, Product::class.java)
+                        .buildAggregation()
+                    val groupAggregation = GroupAggregationInput.builder()
+                        .withBy(
+                            listOf(
+                                GroupByInput.Builder()
+                                    .withKey("updatedAt")
+                                    .withOptions(
+                                        GroupByOptionInput.Builder()
+                                            .withType(GroupByOptionType.DAILY)
+                                            .withTimezone(9)
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                        )
+                        .withAggregations(
+                            listOf(
+                                AggregationInput.builder()
+                                    .withProperty("stockQuantity")
+                                    .withOperator(AggregationAccumulatorOperatorType.SUM)
+                                    .build()
+                            )
+                        )
+                        .build()
+                    SerializationUtils.serializeToJsonSafely(
+                        aggregates.aggregate(listOf(groupAggregation), Product::class.java)
+                            .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                    ) shouldContain expectedQuery
                 }
             }
 

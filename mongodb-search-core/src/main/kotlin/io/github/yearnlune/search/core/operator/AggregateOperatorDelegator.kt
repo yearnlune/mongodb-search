@@ -28,9 +28,22 @@ class AggregateOperatorDelegator {
                         groupBy.option
                             ?.let {
                                 val newFieldKey = "${groupBy.key}_${groupBy.option.ordinal}"
-                                addFields.add(AddFieldsOperator.Field(groupBy.key, groupBy.option, newFieldKey))
+                                addFields.add(AddFieldsOperator.Field(
+                                    key = groupBy.key,
+                                    option = groupBy.option,
+                                    alias = newFieldKey
+                                ))
                                 groupBy.key = newFieldKey
                             }
+                        groupBy.options?.let {
+                            val newFieldKey = "${groupBy.key}_${groupBy.options.type.ordinal}"
+                            addFields.add(AddFieldsOperator.Field(
+                                key = groupBy.key,
+                                options = groupBy.options,
+                                alias = newFieldKey
+                            ))
+                            groupBy.key = newFieldKey
+                        }
                         groupBy.key
                     }
 
