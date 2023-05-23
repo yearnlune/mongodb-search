@@ -92,6 +92,8 @@ class AggregateOperatorDelegator {
                     AggregationAccumulatorOperatorType.SUM -> SumOperator(property, propertyExpression, it.alias)
                     AggregationAccumulatorOperatorType.AVERAGE ->
                         AverageOperator(property, propertyExpression, it.alias)
+                    AggregationAccumulatorOperatorType.MAX -> MaxOperator(property, propertyExpression, it.alias)
+                    AggregationAccumulatorOperatorType.MIN -> MinOperator(property, propertyExpression, it.alias)
                     else -> throw NotSupportedExpressionException("Not supported expression: ${it.operator.name}")
                 }
 

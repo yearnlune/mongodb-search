@@ -278,6 +278,86 @@ class QueryExtensionAggregateTest : DescribeSpec({
                 }
             }
 
+            context("max operator") {
+                it("\$max") {
+                    val searchInput: SearchInput = SearchInput.builder()
+                        .withBy("price")
+                        .withType(PropertyType.DOUBLE)
+                        .withValue(listOf("0.0", "100.0"))
+                        .withOperator(SearchOperatorType.BETWEEN).build()
+
+                    val aggregates = SearchOperatorDelegator()
+                        .create(searchInput, Product::class.java)
+                        .buildAggregation()
+
+                    val groupAggregation = GroupAggregationInput.builder()
+                        .withBy(
+                            listOf(
+                                GroupByInput.Builder()
+                                    .withKey("category")
+                                    .build()
+                            )
+                        )
+                        .withAggregations(
+                            listOf(
+                                AggregationInput.builder()
+                                    .withProperty("price")
+                                    .withOperator(AggregationAccumulatorOperatorType.MAX)
+                                    .build()
+                            )
+                        )
+                        .build()
+                    SerializationUtils.serializeToJsonSafely(
+                        aggregates.aggregate(
+                            listOf(groupAggregation),
+                            Product::class.java
+                        )
+                            .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                    ) shouldBe "[{ \"\$match\" : { \"price\" : { \"\$gte\" : 0.0, \"\$lt\" : 100.0}}}, " +
+                            "{ \"\$group\" : { \"_id\" : \"\$category\", \"price_max\" : { \"\$max\" : \"\$price\"}}}]"
+                }
+            }
+
+            context("min operator") {
+                it("\$min") {
+                    val searchInput: SearchInput = SearchInput.builder()
+                        .withBy("price")
+                        .withType(PropertyType.DOUBLE)
+                        .withValue(listOf("0.0", "100.0"))
+                        .withOperator(SearchOperatorType.BETWEEN).build()
+
+                    val aggregates = SearchOperatorDelegator()
+                        .create(searchInput, Product::class.java)
+                        .buildAggregation()
+
+                    val groupAggregation = GroupAggregationInput.builder()
+                        .withBy(
+                            listOf(
+                                GroupByInput.Builder()
+                                    .withKey("category")
+                                    .build()
+                            )
+                        )
+                        .withAggregations(
+                            listOf(
+                                AggregationInput.builder()
+                                    .withProperty("price")
+                                    .withOperator(AggregationAccumulatorOperatorType.MIN)
+                                    .build()
+                            )
+                        )
+                        .build()
+                    SerializationUtils.serializeToJsonSafely(
+                        aggregates.aggregate(
+                            listOf(groupAggregation),
+                            Product::class.java
+                        )
+                            .toPipeline(Aggregation.DEFAULT_CONTEXT)
+                    ) shouldBe "[{ \"\$match\" : { \"price\" : { \"\$gte\" : 0.0, \"\$lt\" : 100.0}}}, " +
+                            "{ \"\$group\" : { \"_id\" : \"\$category\", \"price_min\" : { \"\$min\" : \"\$price\"}}}]"
+                }
+            }
+
             context("기간별 그룹을 낼 경우") {
                 val start = "1595731371000"
                 val end = "1658803371000"

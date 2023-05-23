@@ -19,6 +19,8 @@ enum AggregationAccumulatorOperatorType {
     COUNT
     SUM
     AVERAGE
+    MAX
+    MIN
 }
 
 enum ComparisonOperatorType {
