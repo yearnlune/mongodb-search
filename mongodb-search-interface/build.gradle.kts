@@ -5,8 +5,8 @@ plugins {
 }
 
 dependencies {
-    implementation("com.graphql-java:graphql-java-extended-scalars:20.0")
-    implementation("com.graphql-java-generator:graphql-java-common-runtime:2.0")
+    api("com.graphql-java:graphql-java-extended-scalars:20.0")
+    api("com.graphql-java-generator:graphql-java-common-runtime:2.0")
 }
 
 tasks.register<Jar>("sourcesJar") {
