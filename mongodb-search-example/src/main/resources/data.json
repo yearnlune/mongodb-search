@@ -1,0 +1,20 @@
+[
+  {
+    "id": "646efca6e610682863c560c0",
+    "name": "Olivia",
+    "email": "o11v1a@example.com",
+    "createdAt": "2023-05-08T08:18:20.128",
+    "updatedAt": "2023-05-08T08:18:20.128",
+    "deleted": false,
+    "_class": "io.github.yearnlune.search.example.domain.entity.User"
+  },
+  {
+    "id": "6481258c5e3fa3f1f641ff7d",
+    "name": "Eliana",
+    "email": "e1iana@example.com",
+    "createdAt": "2023-05-11T09:00:00.008",
+    "updatedAt": "2023-05-11T09:00:00.008",
+    "deleted": false,
+    "_class": "io.github.yearnlune.search.example.domain.entity.User"
+  }
+]

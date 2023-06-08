@@ -1,0 +1,5 @@
+scalar Date
+
+interface PageResponse {
+    total: Int!
+}

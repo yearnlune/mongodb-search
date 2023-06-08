@@ -1,0 +1,18 @@
+type UserDTO {
+    id: String!
+    name: String!
+    location: String
+    email: String
+    homepage: String
+    updatedAt: Date
+}
+
+type UserPageResponse implements PageResponse {
+    users: [UserDTO]
+    total: Int!
+}
+
+type Query {
+    findUser(id: String!): UserDTO
+    findUsers(page: PageInput): UserPageResponse
+}
