@@ -1,0 +1,24 @@
+server:
+  servlet:
+    encoding:
+      force-response: true
+      force: true
+  port: 12838
+spring:
+  graphql:
+    path: /example/api/graphql
+    schema:
+      locations:
+        - classpath:graphql/**
+      printer:
+        enabled: true
+  data:
+    mongodb:
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+      host:
+      port:
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.21
