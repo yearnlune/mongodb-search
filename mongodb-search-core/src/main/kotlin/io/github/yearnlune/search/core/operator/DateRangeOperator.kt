@@ -20,8 +20,8 @@ class DateRangeOperator(
 
     init {
         runCatching {
-            rangeType = DateRangeType.fromGraphQlValue(values[0])
-            unitType = DateUnitType.fromGraphQlValue(values[1])
+            rangeType = DateRangeType.fromValue(values[0])
+            unitType = DateUnitType.fromValue(values[1])
             range = values[2].toInt()
             if (values.size > 3) {
                 source = Instant.ofEpochMilli(values[3].toLong()).atOffset(ZoneOffset.UTC).toLocalDateTime()

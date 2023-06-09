@@ -17,7 +17,7 @@ class ConditionOperator(
         return ConditionalOperators.Cond.`when`(
             SearchOperatorDelegator().create(`if`, Any::class.java).buildExpression()
         ).run {
-            then.value?.let { this.then(it.toMongoType(then.type)) }
+            then.value?.let { this.then(it.toMongoType(then.type!!)) }
                 ?: then.fieldReference?.let { this.thenValueOf(it) }
         }?.let {
             `else`?.let { value -> it.otherwise(value) } ?: it.otherwiseValueOf("nullField")

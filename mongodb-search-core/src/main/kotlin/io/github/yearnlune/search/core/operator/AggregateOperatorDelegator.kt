@@ -27,7 +27,7 @@ class AggregateOperatorDelegator {
                         groupBy.key = groupBy.key.snakeCase()
                         groupBy.option
                             ?.let {
-                                val newFieldKey = "${groupBy.key}_${groupBy.option.ordinal}"
+                                val newFieldKey = "${groupBy.key}_${groupBy.option!!.ordinal}"
                                 addFields.add(AddFieldsOperator.Field(
                                     key = groupBy.key,
                                     option = groupBy.option,
@@ -36,7 +36,7 @@ class AggregateOperatorDelegator {
                                 groupBy.key = newFieldKey
                             }
                         groupBy.options?.let {
-                            val newFieldKey = "${groupBy.key}_${groupBy.options.type.ordinal}"
+                            val newFieldKey = "${groupBy.key}_${groupBy.options!!.type.ordinal}"
                             addFields.add(AddFieldsOperator.Field(
                                 key = groupBy.key,
                                 options = groupBy.options,
@@ -84,7 +84,7 @@ class AggregateOperatorDelegator {
                 val property = it.property?.snakeCase()
                 var propertyExpression: AggregationExpression? = null
                 if (it.propertyExpression != null) {
-                    propertyExpression = fieldExpression(it.propertyExpression)
+                    propertyExpression = fieldExpression(it.propertyExpression!!)
                 }
 
                 val expression = when (it.operator) {

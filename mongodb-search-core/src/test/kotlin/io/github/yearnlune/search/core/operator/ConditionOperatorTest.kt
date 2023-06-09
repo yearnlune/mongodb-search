@@ -9,20 +9,19 @@ import io.kotest.matchers.string.shouldContain
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 
 class ConditionOperatorTest : DescribeSpec({
-    val search =
-        SearchInput.builder()
-            .withBy("score")
-            .withType(PropertyType.INTEGER)
-            .withOperator(SearchOperatorType.BETWEEN)
-            .withValue(listOf("0", "60"))
-            .build()
+    val search = SearchInput(
+        by = "score",
+        type = PropertyType.INTEGER,
+        operator = SearchOperatorType.BETWEEN,
+        value = listOf("0", "60")
+    )
 
     describe("buildExpression") {
         context("조건을 통해 값을 분기할 때") {
             it("\$cond query를 반환한다.") {
                 val conditionExpression = ConditionOperator(
                     search,
-                    DataInput.builder().withType(PropertyType.STRING).withValue("F").build(),
+                    DataInput(type = PropertyType.STRING, value = "F"),
                     "P"
                 ).buildExpression()
                 val expectedQuery =

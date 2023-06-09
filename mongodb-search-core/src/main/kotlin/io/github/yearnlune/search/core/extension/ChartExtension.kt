@@ -40,19 +40,16 @@ fun MongoTemplate.dreamChart(chart: DreamChartInput): DreamChart {
     }
 
     val datasets = values.map {
-        DreamChartDataset.builder()
-            .withLabel(it.key)
-            .withData(it.value)
-            .build()
+        DreamChartDataset(label = it.key, data = it.value.toList())
     }
 
-    return DreamChart.builder()
-        .withTitle(chart.title)
-        .withType(chart.type)
-        .withDescription(chart.description)
-        .withColorPalette(chart.colorPalette)
-        .withValueType(chart.valueType)
-        .withXAxis(keys)
-        .withDatasets(datasets)
-        .build()
+    return DreamChart(
+        title = chart.title,
+        type = chart.type,
+        description = chart.description,
+        colorPalette = chart.colorPalette,
+        valueType = chart.valueType,
+        xAxis = keys,
+        datasets = datasets
+    )
 }

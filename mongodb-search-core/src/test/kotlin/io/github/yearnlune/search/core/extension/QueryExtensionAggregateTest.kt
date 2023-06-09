@@ -33,33 +33,23 @@ class QueryExtensionAggregateTest : DescribeSpec({
     describe("aggregate") {
         context("group") {
             context("count operator") {
-                val searchInput: SearchInput = SearchInput.builder()
-                    .withBy("name")
-                    .withType(PropertyType.STRING)
-                    .withValue(listOf("사과", "바나나", "세제"))
-                    .withOperator(SearchOperatorType.EQUAL).build()
+                val searchInput: SearchInput = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과", "바나나", "세제"),
+                    operator = SearchOperatorType.EQUAL
+                )
 
                 context("그룹 별 개수를 구할 때") {
                     it("\$group에서 \$count를 사용한다.") {
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
-                        val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(
-                                listOf(
-                                    GroupByInput.Builder()
-                                        .withKey("category")
-                                        .build()
-                                )
-                            )
-                            .withAggregations(
-                                listOf(
-                                    AggregationInput.builder()
-                                        .withOperator(AggregationAccumulatorOperatorType.COUNT)
-                                        .build()
-                                )
-                            )
-                            .build()
+                        val groupAggregation = GroupAggregationInput(
+                            by = listOf(GroupByInput(key = "category")),
+                            aggregations = listOf(AggregationInput(operator = AggregationAccumulatorOperatorType.COUNT))
+                        )
+
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
@@ -70,35 +60,28 @@ class QueryExtensionAggregateTest : DescribeSpec({
             }
 
             context("sum operator") {
-                val searchInput: SearchInput = SearchInput.builder()
-                    .withBy("price")
-                    .withType(PropertyType.DOUBLE)
-                    .withValue(listOf("0.0", "100.0"))
-                    .withOperator(SearchOperatorType.BETWEEN).build()
+                val searchInput = SearchInput(
+                    by = "price",
+                    type = PropertyType.DOUBLE,
+                    value = listOf("0.0", "100.0"),
+                    operator = SearchOperatorType.BETWEEN
+                )
 
                 context("특정 필드의 그룹 별 총합을 구할 때") {
                     it("\$group에서 \$sum을 사용한다.") {
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
+                        val groupAggregation = GroupAggregationInput(
+                            by = listOf(GroupByInput(key = "category")),
+                            aggregations = listOf(
+                                AggregationInput(
+                                    property = "stockQuantity",
+                                    operator = AggregationAccumulatorOperatorType.SUM
+                                )
+                            )
+                        )
 
-                        val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(
-                                listOf(
-                                    GroupByInput.Builder()
-                                        .withKey("category")
-                                        .build()
-                                )
-                            )
-                            .withAggregations(
-                                listOf(
-                                    AggregationInput.builder()
-                                        .withProperty("stockQuantity")
-                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                        .build()
-                                )
-                            )
-                            .build()
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(
                                 listOf(groupAggregation),
@@ -115,23 +98,14 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                 val aggregates = SearchOperatorDelegator()
                                     .create(searchInput, Product::class.java)
                                     .buildAggregation()
-
-                                val groupAggregation = GroupAggregationInput.builder()
-                                    .withBy(
-                                        listOf(
-                                            GroupByInput.Builder()
-                                                .withKey("category")
-                                                .build()
-                                        )
+                                val groupAggregation = GroupAggregationInput(
+                                    by = listOf(
+                                        GroupByInput(key = "category")
+                                    ),
+                                    aggregations = listOf(
+                                        AggregationInput(operator = AggregationAccumulatorOperatorType.SUM)
                                     )
-                                    .withAggregations(
-                                        listOf(
-                                            AggregationInput.builder()
-                                                .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                                .build()
-                                        )
-                                    )
-                                    .build()
+                                )
 
                                 shouldThrow<ValidationException> {
                                     aggregates.aggregate(
@@ -148,23 +122,14 @@ class QueryExtensionAggregateTest : DescribeSpec({
                                     .create(searchInput, Product::class.java)
                                     .buildAggregation()
 
-                                val groupAggregation = GroupAggregationInput.builder()
-                                    .withBy(
-                                        listOf(
-                                            GroupByInput.Builder()
-                                                .withKey("category")
-                                                .build()
-                                        )
+                                val groupAggregation = GroupAggregationInput(
+                                    by = listOf(
+                                        GroupByInput(key = "category")
+                                    ),
+                                    aggregations = listOf(
+                                        AggregationInput(operator = AggregationAccumulatorOperatorType.SUM)
                                     )
-                                    .withAggregations(
-                                        listOf(
-                                            AggregationInput.builder()
-                                                .withProperty("")
-                                                .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                                .build()
-                                        )
-                                    )
-                                    .build()
+                                )
 
                                 shouldThrow<ValidationException> {
                                     aggregates.aggregate(
@@ -192,42 +157,27 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
 
-                        val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(
-                                listOf(
-                                    GroupByInput.Builder()
-                                        .withKey("updatedAt")
-                                        .withOption(GroupByOptionType.MONTHLY)
-                                        .build()
+                        val groupAggregation = GroupAggregationInput(
+                            by = listOf(
+                                GroupByInput(
+                                    key = "updatedAt",
+                                    option = GroupByOptionType.MONTHLY
+                                )
+                            ),
+                            aggregations = listOf(
+                                AggregationInput(
+                                    propertyExpression = ConditionInput(
+                                        `if` = SearchInput(
+                                            by = "category",
+                                            operator = SearchOperatorType.EQUAL,
+                                            type = PropertyType.STRING,
+                                            value = listOf("fruit")
+                                        ),
+                                        then = DataInput(type = PropertyType.LONG, value = "1")
+                                    ), operator = AggregationAccumulatorOperatorType.SUM, alias = "과일종류"
                                 )
                             )
-                            .withAggregations(
-                                listOf(
-                                    AggregationInput.builder()
-                                        .withPropertyExpression(
-                                            ConditionInput.builder()
-                                                .withIf(
-                                                    SearchInput.builder()
-                                                        .withBy("category")
-                                                        .withOperator(SearchOperatorType.EQUAL)
-                                                        .withType(PropertyType.STRING)
-                                                        .withValue(listOf("fruit"))
-                                                        .build()
-                                                )
-                                                .withThen(
-                                                    DataInput.builder()
-                                                        .withType(PropertyType.LONG)
-                                                        .withValue("1")
-                                                        .build()
-                                                )
-                                                .build()
-                                        )
-                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                        .withAlias("과일종류")
-                                        .build()
-                                )
-                            )
-                            .build()
+                        )
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
@@ -237,35 +187,29 @@ class QueryExtensionAggregateTest : DescribeSpec({
             }
 
             context("average operator") {
-                val searchInput: SearchInput = SearchInput.builder()
-                    .withBy("updated_at")
-                    .withType(PropertyType.DATE)
-                    .withValue(listOf("1657854891000", "1659150891000"))
-                    .withOperator(SearchOperatorType.BETWEEN).build()
+                val searchInput: SearchInput = SearchInput(
+                    by = "updated_at",
+                    type = PropertyType.DATE,
+                    value = listOf("1657854891000", "1659150891000"),
+                    operator = SearchOperatorType.BETWEEN
+                )
 
                 context("그룹 별 평균을 구할 때") {
                     it("\$group에서 \$avg를 사용한다.") {
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
+                        val groupAggregation = GroupAggregationInput(
+                            by = listOf(
+                                GroupByInput(key = "category")
+                            ), aggregations = listOf(
+                                AggregationInput(
+                                    property = "price",
+                                    operator = AggregationAccumulatorOperatorType.AVERAGE
+                                )
+                            )
+                        )
 
-                        val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(
-                                listOf(
-                                    GroupByInput.Builder()
-                                        .withKey("category")
-                                        .build()
-                                )
-                            )
-                            .withAggregations(
-                                listOf(
-                                    AggregationInput.builder()
-                                        .withProperty("price")
-                                        .withOperator(AggregationAccumulatorOperatorType.AVERAGE)
-                                        .build()
-                                )
-                            )
-                            .build()
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(
                                 listOf(groupAggregation),
@@ -280,33 +224,26 @@ class QueryExtensionAggregateTest : DescribeSpec({
 
             context("max operator") {
                 it("\$max") {
-                    val searchInput: SearchInput = SearchInput.builder()
-                        .withBy("price")
-                        .withType(PropertyType.DOUBLE)
-                        .withValue(listOf("0.0", "100.0"))
-                        .withOperator(SearchOperatorType.BETWEEN).build()
-
+                    val searchInput: SearchInput = SearchInput(
+                        by = "price",
+                        type = PropertyType.DOUBLE,
+                        value = listOf("0.0", "100.0"),
+                        operator = SearchOperatorType.BETWEEN
+                    )
                     val aggregates = SearchOperatorDelegator()
                         .create(searchInput, Product::class.java)
                         .buildAggregation()
+                    val groupAggregation = GroupAggregationInput(
+                        by = listOf(
+                            GroupByInput(key = "category")
+                        ), aggregations = listOf(
+                            AggregationInput(
+                                property = "price",
+                                operator = AggregationAccumulatorOperatorType.MAX
+                            )
+                        )
+                    )
 
-                    val groupAggregation = GroupAggregationInput.builder()
-                        .withBy(
-                            listOf(
-                                GroupByInput.Builder()
-                                    .withKey("category")
-                                    .build()
-                            )
-                        )
-                        .withAggregations(
-                            listOf(
-                                AggregationInput.builder()
-                                    .withProperty("price")
-                                    .withOperator(AggregationAccumulatorOperatorType.MAX)
-                                    .build()
-                            )
-                        )
-                        .build()
                     SerializationUtils.serializeToJsonSafely(
                         aggregates.aggregate(
                             listOf(groupAggregation),
@@ -320,33 +257,26 @@ class QueryExtensionAggregateTest : DescribeSpec({
 
             context("min operator") {
                 it("\$min") {
-                    val searchInput: SearchInput = SearchInput.builder()
-                        .withBy("price")
-                        .withType(PropertyType.DOUBLE)
-                        .withValue(listOf("0.0", "100.0"))
-                        .withOperator(SearchOperatorType.BETWEEN).build()
-
+                    val searchInput: SearchInput = SearchInput(
+                        by = "price",
+                        type = PropertyType.DOUBLE,
+                        value = listOf("0.0", "100.0"),
+                        operator = SearchOperatorType.BETWEEN
+                    )
                     val aggregates = SearchOperatorDelegator()
                         .create(searchInput, Product::class.java)
                         .buildAggregation()
+                    val groupAggregation = GroupAggregationInput(
+                        by = listOf(
+                            GroupByInput(key = "category")
+                        ), aggregations = listOf(
+                            AggregationInput(
+                                property = "price",
+                                operator = AggregationAccumulatorOperatorType.MIN
+                            )
+                        )
+                    )
 
-                    val groupAggregation = GroupAggregationInput.builder()
-                        .withBy(
-                            listOf(
-                                GroupByInput.Builder()
-                                    .withKey("category")
-                                    .build()
-                            )
-                        )
-                        .withAggregations(
-                            listOf(
-                                AggregationInput.builder()
-                                    .withProperty("price")
-                                    .withOperator(AggregationAccumulatorOperatorType.MIN)
-                                    .build()
-                            )
-                        )
-                        .build()
                     SerializationUtils.serializeToJsonSafely(
                         aggregates.aggregate(
                             listOf(groupAggregation),
@@ -361,11 +291,12 @@ class QueryExtensionAggregateTest : DescribeSpec({
             context("기간별 그룹을 낼 경우") {
                 val start = "1595731371000"
                 val end = "1658803371000"
-                val searchInput: SearchInput = SearchInput.builder()
-                    .withBy("updated_at")
-                    .withType(PropertyType.DATE)
-                    .withValue(listOf(start, end))
-                    .withOperator(SearchOperatorType.BETWEEN).build()
+                val searchInput = SearchInput(
+                    by = "updated_at",
+                    type = PropertyType.DATE,
+                    value = listOf(start, end),
+                    operator = SearchOperatorType.BETWEEN
+                )
 
                 context("일별") {
                     it("일별 기간을 추가하고 이를 활용하여 그룹화 하는 쿼리를 반환한다.") {
@@ -376,24 +307,17 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
-                        val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(
-                                listOf(
-                                    GroupByInput.Builder()
-                                        .withKey("updatedAt")
-                                        .withOption(GroupByOptionType.DAILY)
-                                        .build()
+                        val groupAggregation = GroupAggregationInput(
+                            by = listOf(
+                                GroupByInput(key = "updatedAt", option = GroupByOptionType.DAILY)
+                            ), aggregations = listOf(
+                                AggregationInput(
+                                    property = "stockQuantity",
+                                    operator = AggregationAccumulatorOperatorType.SUM
                                 )
                             )
-                            .withAggregations(
-                                listOf(
-                                    AggregationInput.builder()
-                                        .withProperty("stockQuantity")
-                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                        .build()
-                                )
-                            )
-                            .build()
+                        )
+
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
@@ -410,24 +334,17 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
-                        val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(
-                                listOf(
-                                    GroupByInput.Builder()
-                                        .withKey("updatedAt")
-                                        .withOption(GroupByOptionType.WEEKLY)
-                                        .build()
+                        val groupAggregation = GroupAggregationInput(
+                            by = listOf(
+                                GroupByInput(key = "updatedAt", option = GroupByOptionType.WEEKLY)
+                            ), aggregations = listOf(
+                                AggregationInput(
+                                    property = "stockQuantity",
+                                    operator = AggregationAccumulatorOperatorType.SUM
                                 )
                             )
-                            .withAggregations(
-                                listOf(
-                                    AggregationInput.builder()
-                                        .withProperty("stockQuantity")
-                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                        .build()
-                                )
-                            )
-                            .build()
+                        )
+
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
@@ -444,24 +361,18 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
-                        val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(
-                                listOf(
-                                    GroupByInput.Builder()
-                                        .withKey("updatedAt")
-                                        .withOption(GroupByOptionType.MONTHLY)
-                                        .build()
+                        val groupAggregation = GroupAggregationInput(
+                            by = listOf(
+                                GroupByInput(key = "updatedAt", option = GroupByOptionType.MONTHLY)
+                            ),
+                            aggregations = listOf(
+                                AggregationInput(
+                                    property = "stockQuantity",
+                                    operator = AggregationAccumulatorOperatorType.SUM
                                 )
                             )
-                            .withAggregations(
-                                listOf(
-                                    AggregationInput.builder()
-                                        .withProperty("stockQuantity")
-                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                        .build()
-                                )
-                            )
-                            .build()
+                        )
+
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
@@ -478,23 +389,17 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         val aggregates = SearchOperatorDelegator()
                             .create(searchInput, Product::class.java)
                             .buildAggregation()
-                        val groupAggregation = GroupAggregationInput.builder()
-                            .withBy(
-                                listOf(
-                                    GroupByInput.Builder()
-                                        .withKey("updatedAt")
-                                        .withOption(GroupByOptionType.YEARLY)
-                                        .build()
+                        val groupAggregation = GroupAggregationInput(
+                            by = listOf(
+                                GroupByInput(key = "updatedAt", option = GroupByOptionType.YEARLY)
+                            ), aggregations = listOf(
+                                AggregationInput(
+                                    property = "stockQuantity",
+                                    operator = AggregationAccumulatorOperatorType.SUM
                                 )
                             )
-                            .withAggregations(
-                                listOf(AggregationInput.builder()
-                                        .withProperty("stockQuantity")
-                                        .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                        .build()
-                                )
-                            )
-                            .build()
+                        )
+
                         SerializationUtils.serializeToJsonSafely(
                             aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                                 .toPipeline(Aggregation.DEFAULT_CONTEXT)
@@ -510,29 +415,21 @@ class QueryExtensionAggregateTest : DescribeSpec({
                     val aggregates = SearchOperatorDelegator()
                         .create(searchInput, Product::class.java)
                         .buildAggregation()
-                    val groupAggregation = GroupAggregationInput.builder()
-                        .withBy(
-                            listOf(
-                                GroupByInput.Builder()
-                                    .withKey("updatedAt")
-                                    .withOptions(
-                                        GroupByOptionInput.Builder()
-                                            .withType(GroupByOptionType.DAILY)
-                                            .withTimezone(9)
-                                            .build()
-                                    )
-                                    .build()
+                    val groupAggregation = GroupAggregationInput(
+                        by = listOf(
+                            GroupByInput(
+                                key = "updatedAt",
+                                options = GroupByOptionInput(type = GroupByOptionType.DAILY, timezone = 9)
+                            )
+                        ),
+                        aggregations = listOf(
+                            AggregationInput(
+                                property = "stockQuantity",
+                                operator = AggregationAccumulatorOperatorType.SUM
                             )
                         )
-                        .withAggregations(
-                            listOf(
-                                AggregationInput.builder()
-                                    .withProperty("stockQuantity")
-                                    .withOperator(AggregationAccumulatorOperatorType.SUM)
-                                    .build()
-                            )
-                        )
-                        .build()
+                    )
+
                     SerializationUtils.serializeToJsonSafely(
                         aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                             .toPipeline(Aggregation.DEFAULT_CONTEXT)
@@ -542,25 +439,21 @@ class QueryExtensionAggregateTest : DescribeSpec({
 
             context("올바른 값이 아닐 때") {
                 it("ValidationException를 반환한다.") {
-                    val searchInput: SearchInput = SearchInput.builder()
-                        .withBy("updated_at")
-                        .withType(PropertyType.DATE)
-                        .withValue(listOf("1657854891000", "1659150891000"))
-                        .withOperator(SearchOperatorType.BETWEEN).build()
+                    val searchInput = SearchInput(
+                        by = "updated_at",
+                        type = PropertyType.DATE,
+                        value = listOf("1657854891000", "1659150891000"),
+                        operator = SearchOperatorType.BETWEEN
+                    )
                     val aggregates = SearchOperatorDelegator()
                         .create(searchInput, Product::class.java)
                         .buildAggregation()
-                    val groupAggregation = GroupAggregationInput.builder()
-                        .withBy(listOf())
-                        .withAggregations(
-                            listOf(
-                                AggregationInput.builder()
-                                    .withProperty("price")
-                                    .withOperator(AggregationAccumulatorOperatorType.AVERAGE)
-                                    .build()
-                            )
+                    val groupAggregation = GroupAggregationInput(
+                        by = listOf(),
+                        aggregations = listOf(
+                            AggregationInput(property = "price", operator = AggregationAccumulatorOperatorType.AVERAGE)
                         )
-                        .build()
+                    )
 
                     shouldThrow<ValidationException> {
                         aggregates.aggregate(
@@ -574,31 +467,19 @@ class QueryExtensionAggregateTest : DescribeSpec({
             context("필드의 존재여부로 나눌 경우") {
                 it("\$not을 활용하여 필드를 추가하여 쿼리 제공한다.") {
                     val aggregates = SearchOperatorDelegator().create(
-                        SearchInput.builder()
-                            .withBy("name")
-                            .withType(PropertyType.STRING)
-                            .withValue(listOf("사과", "바나나", "세제"))
-                            .withOperator(SearchOperatorType.EQUAL)
-                            .build(),
+                        SearchInput(
+                            by = "name",
+                            type = PropertyType.STRING,
+                            value = listOf("사과", "바나나", "세제"),
+                            operator = SearchOperatorType.EQUAL
+                        ),
                         Product::class.java
                     ).buildAggregation()
-                    val groupAggregation = GroupAggregationInput.builder()
-                        .withBy(
-                            listOf(
-                                GroupByInput.Builder()
-                                    .withKey("deleted")
-                                    .withOption(GroupByOptionType.EXISTS)
-                                    .build()
-                            )
-                        )
-                        .withAggregations(
-                            listOf(
-                                AggregationInput.builder()
-                                    .withOperator(AggregationAccumulatorOperatorType.COUNT)
-                                    .build()
-                            )
-                        )
-                        .build()
+                    val groupAggregation = GroupAggregationInput(
+                        by = listOf(GroupByInput(key = "deleted", option = GroupByOptionType.EXISTS)),
+                        aggregations = listOf(AggregationInput(operator = AggregationAccumulatorOperatorType.COUNT))
+                    )
+
                     SerializationUtils.serializeToJsonSafely(
                         aggregates.aggregate(listOf(groupAggregation), Product::class.java)
                             .toPipeline(Aggregation.DEFAULT_CONTEXT)
@@ -610,21 +491,18 @@ class QueryExtensionAggregateTest : DescribeSpec({
         context("count") {
             context("전체 개수를 구할 때") {
                 it("\$count 를 사용한다.") {
-                    val searchInput: SearchInput = SearchInput.builder()
-                        .withBy("name")
-                        .withType(PropertyType.STRING)
-                        .withValue(listOf("사과", "바나나", "세제"))
-                        .withOperator(SearchOperatorType.EQUAL).build()
-                    val countAggregation = CountAggregationInput.builder()
-                        .withAlias("total")
-                        .build()
+                    val searchInput =
+                        SearchInput(
+                            by = "name",
+                            type = PropertyType.STRING,
+                            value = listOf("사과", "바나나", "세제"),
+                            operator = SearchOperatorType.EQUAL
+                        )
+                    val countAggregation = CountAggregationInput(alias = "total")
 
                     SerializationUtils.serializeToJsonSafely(
                         MongoSearch.statistic(
-                            StatisticInput.builder()
-                                .withSearches(listOf(searchInput))
-                                .withAggregates(listOf(countAggregation))
-                                .build(),
+                            StatisticInput(searches = listOf(searchInput), aggregates = listOf(countAggregation)),
                             Product::class.java
                         ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                     ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$count\" : \"total\"}]"
@@ -635,21 +513,17 @@ class QueryExtensionAggregateTest : DescribeSpec({
         context("limit") {
             context("상위 데이터를 가져올 때") {
                 it("\$limit 를 사용한다.") {
-                    val searchInput: SearchInput = SearchInput.builder()
-                        .withBy("name")
-                        .withType(PropertyType.STRING)
-                        .withValue(listOf("사과", "바나나", "세제"))
-                        .withOperator(SearchOperatorType.EQUAL).build()
-                    val limitAggregation = LimitAggregationInput.builder()
-                        .withMaxElements(5L)
-                        .build()
+                    val searchInput = SearchInput(
+                        by = "name",
+                        type = PropertyType.STRING,
+                        value = listOf("사과", "바나나", "세제"),
+                        operator = SearchOperatorType.EQUAL
+                    )
+                    val limitAggregation = LimitAggregationInput(maxElements = 5L)
 
                     SerializationUtils.serializeToJsonSafely(
                         MongoSearch.statistic(
-                            StatisticInput.builder()
-                                .withSearches(listOf(searchInput))
-                                .withAggregates(listOf(limitAggregation))
-                                .build(),
+                            StatisticInput(searches = listOf(searchInput), aggregates = listOf(limitAggregation)),
                             Product::class.java
                         ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                     ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$limit\" : 5}]"
@@ -659,60 +533,41 @@ class QueryExtensionAggregateTest : DescribeSpec({
 
         context("sort") {
             it("하나를 정렬할 때 \$sort 를 사용한다") {
-                val searchInput: SearchInput = SearchInput.builder()
-                    .withBy("name")
-                    .withType(PropertyType.STRING)
-                    .withValue(listOf("사과", "바나나", "세제"))
-                    .withOperator(SearchOperatorType.EQUAL).build()
-                val sortAggregation = SortAggregationInput.builder()
-                    .withSorts(
-                        listOf(
-                            SortInput.builder()
-                                .withProperty("name")
-                                .withIsDescending(false)
-                                .build()
-                        )
-                    )
-                    .build()
+                val searchInput: SearchInput = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과", "바나나", "세제"),
+                    operator = SearchOperatorType.EQUAL
+                )
+                val sortAggregation = SortAggregationInput(sorts = listOf(
+                    SortInput(property = "name", isDescending = false)
+                ))
 
                 SerializationUtils.serializeToJsonSafely(
                     MongoSearch.statistic(
-                        StatisticInput.builder()
-                            .withSearches(listOf(searchInput))
-                            .withAggregates(listOf(sortAggregation))
-                            .build(),
+                        StatisticInput(searches = listOf(searchInput), aggregates = listOf(sortAggregation)),
                         Product::class.java
                     ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                 ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$sort\" : { \"name\" : 1}}]"
             }
 
             it("두개 이상을 정렬할 때 \$sort 를 사용한다") {
-                val searchInput: SearchInput = SearchInput.builder()
-                    .withBy("name")
-                    .withType(PropertyType.STRING)
-                    .withValue(listOf("사과", "바나나", "세제"))
-                    .withOperator(SearchOperatorType.EQUAL).build()
-                val sortAggregation = SortAggregationInput.builder()
-                    .withSorts(
-                        listOf(
-                            SortInput.builder()
-                                .withProperty("name")
-                                .withIsDescending(false)
-                                .build(),
-                            SortInput.builder()
-                                .withProperty("price")
-                                .withIsDescending(true)
-                                .build()
-                        )
+                val searchInput: SearchInput = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과", "바나나", "세제"),
+                    operator = SearchOperatorType.EQUAL
+                )
+                val sortAggregation = SortAggregationInput(
+                    sorts = listOf(
+                        SortInput(property = "name"),
+                        SortInput(property = "price", isDescending = true)
                     )
-                    .build()
+                )
 
                 SerializationUtils.serializeToJsonSafely(
                     MongoSearch.statistic(
-                        StatisticInput.builder()
-                            .withSearches(listOf(searchInput))
-                            .withAggregates(listOf(sortAggregation))
-                            .build(),
+                        StatisticInput(searches = listOf(searchInput), aggregates = listOf(sortAggregation)),
                         Product::class.java
                     ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                 ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$sort\" : { \"name\" : 1, \"price\" : -1}}]"
@@ -721,21 +576,17 @@ class QueryExtensionAggregateTest : DescribeSpec({
 
         context("unwind") {
             it("d ") {
-                val searchInput: SearchInput = SearchInput.builder()
-                    .withBy("name")
-                    .withType(PropertyType.STRING)
-                    .withValue(listOf("사과", "바나나", "세제"))
-                    .withOperator(SearchOperatorType.EQUAL).build()
-                val unwindAggregation = UnwindAggregationInput.builder()
-                    .withBy("tags")
-                    .build()
+                val searchInput: SearchInput = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과", "바나나", "세제"),
+                    operator = SearchOperatorType.EQUAL
+                )
+                val unwindAggregation = UnwindAggregationInput(by = "tags")
 
                 SerializationUtils.serializeToJsonSafely(
                     MongoSearch.statistic(
-                        StatisticInput.builder()
-                            .withSearches(listOf(searchInput))
-                            .withAggregates(listOf(unwindAggregation))
-                            .build(),
+                        StatisticInput(searches = listOf(searchInput), aggregates = listOf(unwindAggregation)),
                         Product::class.java
                     ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                 ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}}}, { \"\$unwind\" : \"\$tags\"}]"
