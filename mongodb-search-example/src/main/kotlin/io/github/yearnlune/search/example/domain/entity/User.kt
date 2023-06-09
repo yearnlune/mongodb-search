@@ -1,10 +1,10 @@
 package io.github.yearnlune.search.example.domain.entity
 
 import io.github.yearnlune.search.example.graphql.UserDTO
+import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
-import org.bson.types.ObjectId
 
 @Document("users")
 class User(

@@ -111,7 +111,7 @@ class CommonExtensionTest : DescribeSpec({
         context("Map의 데이터에 따라") {
             it("GroupAggregationInput으로 반환한다.") {
                 val map = jacksonObjectMapper().convertValue(
-                    GroupAggregationInput(by = listOf(GroupByInput(key=""))),
+                    GroupAggregationInput(by = listOf(GroupByInput(key = ""))),
                     Map::class.java
                 )
                 map.toAggregationInput().shouldBeTypeOf<GroupAggregationInput>()
