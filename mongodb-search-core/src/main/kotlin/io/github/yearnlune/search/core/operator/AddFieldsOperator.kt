@@ -74,7 +74,7 @@ class AddFieldsOperator(
         val alias: String
     ) {
 
-        fun isDateOption() = (option != null && option !== GroupByOptionType.EXISTS)
-                || (options != null && options.type !== GroupByOptionType.EXISTS)
+        fun isDateOption() = (option != null && option !== GroupByOptionType.EXISTS) ||
+            (options != null && options.type !== GroupByOptionType.EXISTS)
     }
 }

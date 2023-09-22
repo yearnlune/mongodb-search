@@ -39,6 +39,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     implementation(project(":mongodb-search-core"))
+    implementation("com.graphql-java-generator:graphql-java-common-runtime:2.0")
 
     implementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.6.2")
 

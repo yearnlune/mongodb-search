@@ -14,36 +14,46 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.SerializationUtils
 
-class QueryExtensionSearchTest : DescribeSpec({
+class QueryExtensionSearchTest() : DescribeSpec({
 
     describe("search") {
         context("equal operator") {
             it("검색어가 하나 일 때") {
-                val searchInput: SearchInput =
-                    SearchInput.builder().withBy("name").withType(PropertyType.STRING).withValue(listOf("사과"))
-                        .withOperator(SearchOperatorType.EQUAL).build()
-
+                val searchInput = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과"),
+                    operator = SearchOperatorType.EQUAL
+                )
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
+
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
                     "{ \"name\" : { \"\$in\" : [\"사과\"]}}"
             }
 
             it("검색어가 여러 개 일 때") {
-                val searchInput: SearchInput =
-                    SearchInput.builder().withBy("name").withType(PropertyType.STRING).withValue(listOf("사과", "바나나"))
-                        .withOperator(SearchOperatorType.EQUAL).build()
+                val searchInput = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과", "바나나"),
+                    operator = SearchOperatorType.EQUAL
+                )
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
+
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe "{ \"name\" : { \"\$in\" : [\"사과\", \"바나나\"]}}"
             }
         }
 
         context("contain operator") {
             it("검색어가 하나 일 때") {
-                val searchInput: SearchInput =
-                    SearchInput.builder().withBy("name").withType(PropertyType.STRING).withValue(listOf("사과"))
-                        .withOperator(SearchOperatorType.CONTAIN).build()
-
+                val searchInput = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과"),
+                    operator = SearchOperatorType.CONTAIN
+                )
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
+
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe "{ \"name\" : { \"\$regularExpression\" : { \"pattern\" : \"사과\", \"options\" : \"iu\"}}}"
             }
         }
@@ -51,18 +61,26 @@ class QueryExtensionSearchTest : DescribeSpec({
         context("between operator") {
             it("long 타입의 timestamp일 때") {
                 val start = 1657767559757L
-                val searchInput: SearchInput = SearchInput.builder().withBy("updated_at").withType(PropertyType.DATE)
-                    .withValue(listOf("$start", "${start + 1000L}")).withOperator(SearchOperatorType.BETWEEN).build()
-
+                val searchInput = SearchInput(
+                    by = "updated_at",
+                    type = PropertyType.DATE,
+                    value = listOf("$start", "${start + 1000L}"),
+                    operator = SearchOperatorType.BETWEEN
+                )
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
+
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
                     "{ \"updated_at\" : { \"\$gte\" : 1657767559757, \"\$lt\" : 1657767560757}}"
             }
 
             it("objectId 타입일 때") {
                 val start = 1657767559757L
-                val searchInput: SearchInput = SearchInput.builder().withBy("id").withType(PropertyType.OBJECT_ID)
-                    .withValue(listOf("$start", "${start + 1000L}")).withOperator(SearchOperatorType.BETWEEN).build()
+                val searchInput = SearchInput(
+                    by = "id",
+                    type = PropertyType.OBJECT_ID,
+                    value = listOf("$start", "${start + 1000L}"),
+                    operator = SearchOperatorType.BETWEEN
+                )
 
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
@@ -71,9 +89,12 @@ class QueryExtensionSearchTest : DescribeSpec({
 
             it("현재시각으로 검색 할 때") {
                 val start = ReservedWordType.CURRENT_DATE.name
-                val searchInput: SearchInput = SearchInput.builder().withBy("updated_at").withType(PropertyType.DATE)
-                    .withValue(listOf(start, "1738291115000")).withOperator(SearchOperatorType.BETWEEN).build()
-
+                val searchInput = SearchInput(
+                    by = "updated_at",
+                    type = PropertyType.DATE,
+                    value = listOf(start, "1738291115000"),
+                    operator = SearchOperatorType.BETWEEN
+                )
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
 
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldContain
@@ -85,12 +106,12 @@ class QueryExtensionSearchTest : DescribeSpec({
             it("String 타입일 때") {
                 val property = "ip"
                 val startWith = "192.168.12"
-                val searchInput: SearchInput = SearchInput.builder()
-                    .withBy(property)
-                    .withType(PropertyType.STRING)
-                    .withValue(listOf(startWith))
-                    .withOperator(SearchOperatorType.START_WITH)
-                    .build()
+                val searchInput = SearchInput(
+                    by = property,
+                    type = PropertyType.STRING,
+                    value = listOf(startWith),
+                    operator = SearchOperatorType.START_WITH
+                )
 
                 val criteria = Criteria().search(listOf(searchInput), Any::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
@@ -101,12 +122,12 @@ class QueryExtensionSearchTest : DescribeSpec({
         context("dateRange operator") {
             it("현재 시각부터 이전 3일 동안") {
                 val property = "updated_at"
-                val searchInput = SearchInput.builder()
-                    .withBy(property)
-                    .withType(PropertyType.ANY)
-                    .withValue(listOf("LAST", "DAYS", "3"))
-                    .withOperator(SearchOperatorType.DATE_RANGE)
-                    .build()
+                val searchInput = SearchInput(
+                    by = property,
+                    type = PropertyType.ANY,
+                    value = listOf("LAST", "DAYS", "3"),
+                    operator = SearchOperatorType.DATE_RANGE
+                )
                 val criteria = Criteria().search(listOf(searchInput), Any::class.java)
                 val updatedAtDoc = Query(criteria).queryObject["updated_at"] as Document
                 val lte = updatedAtDoc.getLong("\$lt")
@@ -121,12 +142,14 @@ class QueryExtensionSearchTest : DescribeSpec({
             it("\$match를 query를 추가하여 반환한다.") {
                 val start = 1657767559757L
                 val searches: List<SearchInput> = listOf(
-                    SearchInput.builder()
-                        .withBy("updated_at")
-                        .withType(PropertyType.DATE)
-                        .withValue(listOf("$start", "${start + 1000L}"))
-                        .withOperator(SearchOperatorType.BETWEEN).build()
+                    SearchInput(
+                        by = "updated_at",
+                        type = PropertyType.DATE,
+                        value = listOf("$start", "${start + 1000L}"),
+                        operator = SearchOperatorType.BETWEEN
+                    )
                 )
+
                 SerializationUtils.serializeToJsonSafely(
                     Aggregation.newAggregation(
                         Aggregation.match(Criteria.where("deleted").exists(false))

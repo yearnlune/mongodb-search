@@ -111,7 +111,7 @@ class CommonExtensionTest : DescribeSpec({
         context("Map의 데이터에 따라") {
             it("GroupAggregationInput으로 반환한다.") {
                 val map = jacksonObjectMapper().convertValue(
-                    GroupAggregationInput.builder().withBy(listOf(GroupByInput.builder().build())).build(),
+                    GroupAggregationInput(by = listOf(GroupByInput(key = ""))),
                     Map::class.java
                 )
                 map.toAggregationInput().shouldBeTypeOf<GroupAggregationInput>()
@@ -119,7 +119,7 @@ class CommonExtensionTest : DescribeSpec({
 
             it("CountAggregationInput으로 반환한다.") {
                 val map = jacksonObjectMapper().convertValue(
-                    CountAggregationInput.builder().build(),
+                    CountAggregationInput(),
                     Map::class.java
                 )
                 map.toAggregationInput().shouldBeTypeOf<CountAggregationInput>()
@@ -127,7 +127,7 @@ class CommonExtensionTest : DescribeSpec({
 
             it("NotSupportedOperatorException 예외를 반환한다.") {
                 val map = jacksonObjectMapper().convertValue(
-                    StatisticInput.builder().build(),
+                    StatisticInput(),
                     Map::class.java
                 )
 

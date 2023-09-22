@@ -22,24 +22,24 @@ class MongoSearchTest : DescribeSpec({
             it("criteria query를 반환한다.") {
                 val criteria = MongoSearch.search(
                     listOf(
-                        SearchInput.builder()
-                            .withBy("name")
-                            .withType(PropertyType.STRING)
-                            .withValue(listOf("사과"))
-                            .withOperator(SearchOperatorType.CONTAIN)
-                            .build(),
-                        SearchInput.builder()
-                            .withBy("updated_at")
-                            .withType(PropertyType.DATE)
-                            .withValue(listOf("1657854891000", "1659150891000"))
-                            .withOperator(SearchOperatorType.BETWEEN)
-                            .build(),
-                        SearchInput.builder()
-                            .withBy("price")
-                            .withType(PropertyType.DOUBLE)
-                            .withValue(listOf("0.0", "100.0"))
-                            .withOperator(SearchOperatorType.BETWEEN)
-                            .build()
+                        SearchInput(
+                            by = "name",
+                            type = PropertyType.STRING,
+                            value = listOf("사과"),
+                            operator = SearchOperatorType.CONTAIN
+                        ),
+                        SearchInput(
+                            by = "updated_at",
+                            type = PropertyType.DATE,
+                            value = listOf("1657854891000", "1659150891000"),
+                            operator = SearchOperatorType.BETWEEN
+                        ),
+                        SearchInput(
+                            by = "price",
+                            type = PropertyType.DOUBLE,
+                            value = listOf("0.0", "100.0"),
+                            operator = SearchOperatorType.BETWEEN
+                        )
                     ),
                     Product::class.java
                 )
@@ -52,28 +52,23 @@ class MongoSearchTest : DescribeSpec({
     describe("statistic") {
         context("단일 aggregate를 할 경우") {
             it("aggregation query를 반환한다.") {
-                val equal: SearchInput = SearchInput.builder()
-                    .withBy("name")
-                    .withType(PropertyType.STRING)
-                    .withValue(listOf("사과", "바나나", "세제"))
-                    .withOperator(SearchOperatorType.EQUAL)
-                    .build()
-                val between = SearchInput.builder()
-                    .withBy("updated_at")
-                    .withType(PropertyType.DATE)
-                    .withValue(listOf("1657854891000", "1659150891000"))
-                    .withOperator(SearchOperatorType.BETWEEN)
-                    .build()
-                val countAggregation = CountAggregationInput.builder()
-                    .withAlias("total")
-                    .build()
+                val equal = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과", "바나나", "세제"),
+                    operator = SearchOperatorType.EQUAL
+                )
+                val between = SearchInput(
+                    by = "updated_at",
+                    type = PropertyType.DATE,
+                    value = listOf("1657854891000", "1659150891000"),
+                    operator = SearchOperatorType.BETWEEN
+                )
+                val countAggregation = CountAggregationInput(alias = "total")
 
                 SerializationUtils.serializeToJsonSafely(
                     MongoSearch.statistic(
-                        StatisticInput.builder()
-                            .withSearches(listOf(equal, between))
-                            .withAggregates(listOf(countAggregation))
-                            .build(),
+                        StatisticInput(searches = listOf(equal, between), aggregates = listOf(countAggregation)),
                         Product::class.java
                     ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                 ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}, \"updated_at\" : { \"\$gte\" : 1657854891000, \"\$lt\" : 1659150891000}}}, { \"\$count\" : \"total\"}]"
@@ -82,45 +77,29 @@ class MongoSearchTest : DescribeSpec({
 
         context("복수의 aggregate를 할 경우") {
             it("aggregation query를 반환한다.") {
-                val equal: SearchInput = SearchInput.builder()
-                    .withBy("name")
-                    .withType(PropertyType.STRING)
-                    .withValue(listOf("사과", "바나나", "세제"))
-                    .withOperator(SearchOperatorType.EQUAL)
-                    .build()
-                val between = SearchInput.builder()
-                    .withBy("updated_at")
-                    .withType(PropertyType.DATE)
-                    .withValue(listOf("1657854891000", "1659150891000"))
-                    .withOperator(SearchOperatorType.BETWEEN)
-                    .build()
-                val groupAggregation = GroupAggregationInput.builder()
-                    .withBy(
-                        listOf(
-                            GroupByInput.builder()
-                                .withKey("category")
-                                .build()
-                        )
+                val equal = SearchInput(
+                    by = "name",
+                    type = PropertyType.STRING,
+                    value = listOf("사과", "바나나", "세제"),
+                    operator = SearchOperatorType.EQUAL
+                )
+                val between = SearchInput(
+                    by = "updated_at",
+                    type = PropertyType.DATE,
+                    value = listOf("1657854891000", "1659150891000"),
+                    operator = SearchOperatorType.BETWEEN
+                )
+                val groupAggregation = GroupAggregationInput(
+                    by = listOf(GroupByInput(key = "category")),
+                    aggregations = listOf(
+                        AggregationInput(operator = AggregationAccumulatorOperatorType.COUNT),
+                        AggregationInput(property = "price", operator = AggregationAccumulatorOperatorType.AVERAGE)
                     )
-                    .withAggregations(
-                        listOf(
-                            AggregationInput.builder()
-                                .withOperator(AggregationAccumulatorOperatorType.COUNT)
-                                .build(),
-                            AggregationInput.builder()
-                                .withProperty("price")
-                                .withOperator(AggregationAccumulatorOperatorType.AVERAGE)
-                                .build()
-                        )
-                    )
-                    .build()
+                )
 
                 SerializationUtils.serializeToJsonSafely(
                     MongoSearch.statistic(
-                        StatisticInput.builder()
-                            .withSearches(listOf(equal, between))
-                            .withAggregates(listOf(groupAggregation))
-                            .build(),
+                        StatisticInput(searches = listOf(equal, between), aggregates = listOf(groupAggregation)),
                         Product::class.java
                     ).toPipeline(Aggregation.DEFAULT_CONTEXT)
                 ) shouldBe "[{ \"\$match\" : { \"name\" : { \"\$in\" : [\"사과\", \"바나나\", \"세제\"]}, \"updated_at\" : { \"\$gte\" : 1657854891000, \"\$lt\" : 1659150891000}}}, { \"\$group\" : { \"_id\" : \"\$category\", \"count\" : { \"\$sum\" : 1}, \"price_avg\" : { \"\$avg\" : \"\$price\"}}}]"

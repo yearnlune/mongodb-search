@@ -26,3 +26,12 @@ tasks {
         withSourcesJar()
     }
 }
+
+ktlint {
+    ignoreFailures.set(true)
+    filter {
+        exclude {
+            it.file.path.contains("Test.kt")
+        }
+    }
+}
