@@ -1,5 +1,5 @@
 package io.github.yearnlune.search.graphql
 
 class SortAggregationInput(
-    val sorts: List<SortInput> = listOf()
+    var sorts: List<SortInput> = listOf()
 )
