@@ -9,7 +9,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3.3.0
         with:
-          java-version: 17
+          java-version: 11
           distribution: corretto
       - name: Grant permission and publish
         env:
