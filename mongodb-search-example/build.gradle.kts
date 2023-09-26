@@ -1,12 +1,11 @@
 import org.jetbrains.kotlin.backend.common.push
 
-// upper spring boot 3
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-starter-graphql:3.0.7")
+        classpath("org.springframework.boot:spring-boot-starter-graphql:2.7.7")
     }
 }
 
@@ -15,10 +14,10 @@ group = "io.github.yearnlune.search.example"
 plugins {
     kotlin("jvm")
 
-    id("org.springframework.boot") version "3.0.7"
+    id("org.springframework.boot") version "2.7.7"
     kotlin("plugin.spring") version "1.6.21"
 
-    id("com.graphql-java-generator.graphql-gradle-plugin") version "2.0"
+    id("com.graphql_java_generator.graphql-gradle-plugin") version "1.18.6"
     id("io.github.yearnlune.search.plugin") version "1.0.25"
 }
 
@@ -29,9 +28,9 @@ configurations {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web:3.0.7")
-    implementation("org.springframework.boot:spring-boot-starter-graphql:3.0.7")
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.0.7")
+    implementation("org.springframework.boot:spring-boot-starter-web:2.7.7")
+    implementation("org.springframework.boot:spring-boot-starter-graphql:2.7.7")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb:2.7.7")
 
     /* KOTLIN */
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -39,9 +38,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     implementation(project(":mongodb-search-core"))
-    implementation("com.graphql-java-generator:graphql-java-common-runtime:2.0")
+    implementation("com.graphql-java-generator:graphql-java-common-runtime:1.18.7")
 
-    implementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.6.2")
+    implementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring27x:4.9.3")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
