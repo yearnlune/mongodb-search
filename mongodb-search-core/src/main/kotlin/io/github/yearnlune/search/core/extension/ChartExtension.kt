@@ -40,7 +40,7 @@ fun MongoTemplate.dreamChart(chart: DreamChartInput): DreamChart {
     }
 
     val datasets = values.map {
-        DreamChartDataset(label = it.key, data = it.value.toList())
+        DreamChartDataset(label = it.key, data = it.value.toMutableList())
     }
 
     return DreamChart(
