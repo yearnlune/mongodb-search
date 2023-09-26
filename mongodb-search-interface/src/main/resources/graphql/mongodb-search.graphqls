@@ -168,6 +168,7 @@ input DreamChartInput {
     title: String!
     description: String
     type: ChartType!
+    stacked: Boolean!
     colorPalette: ColorPaletteType!
     valueType: ChartValueType!
     datasetMeta: DreamChartDatasetMetaInput!
@@ -182,6 +183,7 @@ type DreamChart {
     title: String!
     description: String
     type: ChartType!
+    stacked: Boolean!
     colorPalette: ColorPaletteType!
     valueType: ChartValueType!
     xAxis: [String]!
@@ -197,6 +199,7 @@ type DreamChartMeta {
     title: String!
     description: String
     type: ChartType!
+    stacked: Boolean!
     colorPalette: ColorPaletteType!
     valueType: ChartValueType!
     datasetMeta: DreamChartDatasetMeta!

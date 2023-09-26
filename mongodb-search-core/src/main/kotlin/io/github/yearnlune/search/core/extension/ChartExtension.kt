@@ -46,6 +46,7 @@ fun MongoTemplate.dreamChart(chart: DreamChartInput): DreamChart {
     return DreamChart(
         title = chart.title,
         type = chart.type,
+        stacked = chart.stacked,
         description = chart.description,
         colorPalette = chart.colorPalette,
         valueType = chart.valueType,
