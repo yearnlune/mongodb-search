@@ -167,10 +167,10 @@ input StatisticInput {
 input DreamChartInput {
     title: String!
     description: String
-    type: ChartType!
-    stacked: Boolean!
-    colorPalette: ColorPaletteType!
-    valueType: ChartValueType!
+    type: ChartType! = HORIZONTAL_BAR
+    stacked: Boolean! = false
+    colorPalette: ColorPaletteType! = BASIC
+    valueType: ChartValueType! = ORIGIN
     datasetMeta: DreamChartDatasetMetaInput!
 }
 
