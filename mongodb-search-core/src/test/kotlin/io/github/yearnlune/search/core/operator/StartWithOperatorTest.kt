@@ -41,7 +41,7 @@ class StartWithOperatorTest : DescribeSpec({
                 val values = listOf("192.168.1")
                 val startWithExpression = StartWithOperator(searchBy, values).buildExpression()
                 val expectedQuery =
-                    "{ \"\$regexMatch\" : { \"input\" : \"\$$searchBy\", \"regex\" : \"^192\\\\.168\\\\.1\", \"options\" : \"iu\"}}"
+                    "{ \"\$regexMatch\" : { \"input\" : \"\$$searchBy\", \"regex\" : \"^192\\\\.168\\\\.1\", \"options\" : \"i\"}}"
 
                 startWithExpression.buildTestAggregation().toString() shouldContain expectedQuery
             }

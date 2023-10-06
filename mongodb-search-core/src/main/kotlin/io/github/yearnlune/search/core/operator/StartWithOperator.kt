@@ -19,7 +19,7 @@ class StartWithOperator(
         return StringOperators.RegexMatch
             .valueOf(searchBy)
             .regex(convertRegex())
-            .options("iu")
+            .options("i")
     }
 
     private fun convertRegex(): String {

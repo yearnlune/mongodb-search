@@ -22,7 +22,7 @@ class ContainOperator(
         return StringOperators.RegexMatch
             .valueOf(searchBy)
             .regex(convertRegex())
-            .options("ui")
+            .options("i")
     }
 
     private fun convertRegex(): String {

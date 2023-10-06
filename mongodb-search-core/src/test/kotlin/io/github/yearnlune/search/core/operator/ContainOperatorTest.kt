@@ -51,7 +51,7 @@ class ContainOperatorTest : DescribeSpec({
                 val values = listOf("apple")
                 val containExpression = ContainOperator(searchBy, values).buildExpression()
                 val expectedQuery =
-                    "{ \"\$regexMatch\" : { \"input\" : \"\$item\", \"regex\" : \"apple\", \"options\" : \"ui\"}}"
+                    "{ \"\$regexMatch\" : { \"input\" : \"\$item\", \"regex\" : \"apple\", \"options\" : \"i\"}}"
 
                 containExpression.buildTestAggregation().toString() shouldContain expectedQuery
             }
@@ -60,7 +60,7 @@ class ContainOperatorTest : DescribeSpec({
                 val values = listOf("apple", "banana")
                 val containExpression = ContainOperator(searchBy, values).buildExpression()
                 val expectedQuery =
-                    "{ \"\$regexMatch\" : { \"input\" : \"\$item\", \"regex\" : \"apple|banana\", \"options\" : \"ui\"}}"
+                    "{ \"\$regexMatch\" : { \"input\" : \"\$item\", \"regex\" : \"apple|banana\", \"options\" : \"i\"}}"
 
                 containExpression.buildTestAggregation().toString() shouldContain expectedQuery
             }
