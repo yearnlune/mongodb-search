@@ -2,7 +2,7 @@ name: build
 on: [ push, pull_request ]
 jobs:
   java-build:
-    name: Build
+    name: Build java
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,8 +20,9 @@ jobs:
             mongodb-search-interface/build/libs
             mongodb-search-gradle-plugin/build/libs
   node-build:
-    name: Build
+    name: Build node
     runs-on: ubuntu-latest
+    working-directory: ./mongodb-search-interface/node
     needs: java-build
     steps:
       - uses: actions/setup-node@v3
@@ -31,14 +32,14 @@ jobs:
       - name: Build
         run: yarn && yarn build
   test:
-    name: test
+    name: Test
     runs-on: ubuntu-latest
     needs: java-build
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: Packages
+          name: java packages
       - uses: actions/setup-java@v3.3.0
         with:
           java-version: 11
