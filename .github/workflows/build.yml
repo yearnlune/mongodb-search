@@ -14,11 +14,11 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew mongodb-search-core:build mongodb-search-gradle-plugin:build
       - uses: actions/upload-artifact@v3
         with:
-          name: java packages
+          name: java artifacts
           path: |
-            mongodb-search-core/build/libs
-            mongodb-search-interface/build/libs
-            mongodb-search-gradle-plugin/build/libs
+            mongodb-search-core/build
+            mongodb-search-interface/build
+            mongodb-search-gradle-plugin/build
   node-build:
     name: Build node
     runs-on: ubuntu-latest
