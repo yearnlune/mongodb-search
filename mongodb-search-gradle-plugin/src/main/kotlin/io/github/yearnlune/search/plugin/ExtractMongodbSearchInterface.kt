@@ -2,7 +2,6 @@ package io.github.yearnlune.search.plugin
 
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.TaskAction
-import org.gradle.util.internal.GUtil
 import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipEntry
@@ -33,7 +32,7 @@ open class ExtractMongodbSearchInterface : CommonTask() {
     }
 
     private fun unzipEntryTo(outputDirectory: File, zip: ZipFile, entry: ZipEntry) {
-        val output = outputDirectory.resolve(GUtil.safeZipEntryName(entry.name))
+        val output = outputDirectory.resolve(entry.name)
         if (entry.isDirectory) {
             output.mkdirs()
         } else {
