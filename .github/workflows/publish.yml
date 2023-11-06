@@ -2,10 +2,10 @@ name: publish
 on:
   push:
     tags:
-      - 'v\d+'
+      - v*
   pull_request:
     tags:
-      - 'v\d+'
+      - v*
 jobs:
   deploy-core:
     name: Publish core
