@@ -1,5 +1,8 @@
 name: publish plugin
 on:
+  workflow_run:
+    workflows: build
+    types: [ completed ]
   push:
     tags:
       - v*
@@ -14,7 +17,7 @@ jobs:
   deploy-plugin:
     name: Publish plugin
     runs-on: ubuntu-latest
-    needs: test
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
     - uses: actions/checkout@v3
     - uses: actions/download-artifact@v3
