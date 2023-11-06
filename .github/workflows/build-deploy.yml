@@ -1,4 +1,4 @@
-name: build
+name: build & deploy
 on:
   push:
   pull_request:
@@ -12,8 +12,9 @@ jobs:
         with:
           java-version: 11
           distribution: corretto
-      - name: Build
-        run: chmod +x ./gradlew && ./gradlew mongodb-search-core:build mongodb-search-gradle-plugin:build
+      - uses: gradle/gradle-build-action@v2
+      - name: Gradle build
+        run: gradle mongodb-search-core:build mongodb-search-gradle-plugin:build
       - uses: actions/upload-artifact@v3
         with:
           name: java artifacts
@@ -37,7 +38,7 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Build
+      - name: Yarn build
         run: yarn && yarn build
   test:
     name: Test
@@ -68,6 +69,7 @@ jobs:
         with:
           java-version: 11
           distribution: corretto
+      - uses: gradle/gradle-build-action@v2
       - name: Publish libraries
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
@@ -75,14 +77,16 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-        run: ./gradlew publish --no-daemon
+        run: gradle publish --no-daemon
   deploy-interface:
     name: Publish interface
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: mongodb-search-interface/node
-    needs: test
+    needs:
+      - test
+      - node-build
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - uses: actions/checkout@v3
@@ -114,6 +118,7 @@ jobs:
         with:
           java-version: 11
           distribution: corretto
+      - uses: gradle/gradle-build-action@v2
       - uses: tj-actions/changed-files@v40
         with:
           files: mongodb-search-gradle-plugin/**
@@ -122,4 +127,4 @@ jobs:
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-        run: chmod +x ./gradlew && ./gradlew mongodb-search-gradle-plugin:publishPlugins
+        run: gradle mongodb-search-gradle-plugin:publishPlugins
