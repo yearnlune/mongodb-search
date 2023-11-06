@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: java packages
+          name: java artifacts
       - uses: actions/setup-java@v3.3.0
         with:
           java-version: 11
@@ -38,7 +38,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/download-artifact@v3
       with:
-        name: java packages
+        name: java artifacts
     - uses: actions/setup-java@v3.3.0
       with:
         java-version: 11
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: java packages
+          name: java artifacts
       - uses: actions/setup-node@v3
         with:
           node-version: '16.x'
