@@ -6,6 +6,7 @@ on:
     types:
       - completed
     branches:
+      - 'fix/pretty-ci'
       - '**'
 jobs:
   deploy-plugin:

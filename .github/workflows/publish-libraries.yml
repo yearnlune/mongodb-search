@@ -5,6 +5,8 @@ on:
     types:
       - completed
     branches:
+      - '*-*'
+      - '*/*'
       - '**'
 jobs:
   init:
