@@ -1,11 +1,11 @@
 name: publish libraries
 on:
   workflow_run:
-    workflows: [build]
+    workflows: ["build"]
     types:
       - completed
     branches:
-      - '*'
+      - '**'
 jobs:
   init:
     runs-on: ubuntu-latest

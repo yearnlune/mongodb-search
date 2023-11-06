@@ -2,11 +2,11 @@ name: publish plugin
 run-name: Release ${{ github.ref_name }} plugin
 on:
   workflow_run:
-    workflows: [build]
+    workflows: ["build"]
     types:
       - completed
     branches:
-      - '*'
+      - '**'
 jobs:
   deploy-plugin:
     name: Publish plugin
