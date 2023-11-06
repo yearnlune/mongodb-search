@@ -1,8 +1,9 @@
 name: publish plugin
 on:
   workflow_run:
-    workflows: build
-    types: [ completed ]
+    workflows: [build]
+    types:
+      - completed
 jobs:
   deploy-plugin:
     name: Publish plugin
