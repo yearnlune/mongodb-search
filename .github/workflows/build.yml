@@ -52,5 +52,5 @@ jobs:
         with:
           java-version: 11
           distribution: corretto
-      - name: Build
+      - name: Unit test
         run: chmod +x ./gradlew && ./gradlew mongodb-search-core:test
