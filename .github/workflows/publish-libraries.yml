@@ -1,19 +1,13 @@
 name: publish libraries
 on:
   workflow_run:
-    workflows: build
+    workflows: ["build"]
     types: [completed]
-  push:
-    tags:
-      - v*
-  pull_request:
-    tags:
-      - v*
 jobs:
   deploy-core:
     name: Publish core
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.ref, 'refs/tags/v')}}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -37,7 +31,7 @@ jobs:
     defaults:
       run:
         working-directory: mongodb-search-interface/node
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.ref, 'refs/tags/v')}}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
