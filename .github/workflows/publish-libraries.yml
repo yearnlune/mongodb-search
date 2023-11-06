@@ -5,7 +5,7 @@ on:
     types:
       - completed
     branches:
-      - *
+      - '*'
 jobs:
   init:
     runs-on: ubuntu-latest

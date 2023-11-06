@@ -6,7 +6,7 @@ on:
     types:
       - completed
     branches:
-      - *
+      - '*'
 jobs:
   deploy-plugin:
     name: Publish plugin
