@@ -1,7 +1,10 @@
 name: publish plugin
 run-name: Release ${{ github.ref_name }} plugin
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: [build]
+    types:
+      - completed
 jobs:
   call-build:
     uses: ./.github/workflows/build.yml
