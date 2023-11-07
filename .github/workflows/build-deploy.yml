@@ -1,0 +1,139 @@
+name: build & deploy
+on:
+  push:
+  pull_request:
+jobs:
+  java-build:
+    name: Build java
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: corretto
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+      - name: Gradle build
+        run: gradle mongodb-search-core:build mongodb-search-gradle-plugin:build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: java artifacts
+          path: |
+            mongodb-search-core/build
+            mongodb-search-interface/build
+            mongodb-search-gradle-plugin/build
+  node-build:
+    name: Build node
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mongodb-search-interface/node
+    needs: java-build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: java artifacts
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Yarn build
+        run: yarn && yarn build
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: java-build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: java artifacts
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: corretto
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+      - name: Unit test
+        run: gradle mongodb-search-core:test
+  deploy-core:
+    name: Publish core
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: java artifacts
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: corretto
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+      - name: Publish libraries
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+        run: gradle publish --no-daemon
+  deploy-interface:
+    name: Publish interface
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mongodb-search-interface/node
+    needs:
+      - test
+      - node-build
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: java artifacts
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - id: tag
+        run: echo ::set-output name=tag::$(echo ${GITHUB_REF:11})
+      - run: node .ci/set-version ${{ steps.tag.outputs.tag }}
+      - name: Publish package
+        run: yarn publish --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  deploy-plugin:
+    name: Publish plugin
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: java artifacts
+      - uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: corretto
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+      - uses: tj-actions/changed-files@v40
+        with:
+          files: mongodb-search-gradle-plugin/**
+      - name: Publish plugin
+        if: ${{ steps.changed-files-yaml.outputs.any_changed == 'true' }}
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+        run: gradle mongodb-search-gradle-plugin:publishPlugins
