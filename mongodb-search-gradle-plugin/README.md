@@ -6,7 +6,7 @@ This plugin that makes it easy to set mongodb-search configuration
 
 ```kotlin
 plugins {
-    id("io.github.yearnlune.search.plugin") version "0.0.1"
+    id("io.github.yearnlune.search.plugin") version "0.1.8"
 }
 
 configurations {
