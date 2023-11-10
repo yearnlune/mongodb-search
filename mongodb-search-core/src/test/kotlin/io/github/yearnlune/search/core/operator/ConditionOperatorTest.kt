@@ -1,5 +1,6 @@
 package io.github.yearnlune.search.core.operator
 
+import io.github.yearnlune.search.core.type.PropertyNamingStrategyType
 import io.github.yearnlune.search.graphql.DataInput
 import io.github.yearnlune.search.graphql.PropertyType
 import io.github.yearnlune.search.graphql.SearchInput
@@ -22,7 +23,8 @@ class ConditionOperatorTest : DescribeSpec({
                 val conditionExpression = ConditionOperator(
                     search,
                     DataInput(type = PropertyType.STRING, value = "F"),
-                    "P"
+                    "P",
+                    PropertyNamingStrategyType.SNAKE_CASE
                 ).buildExpression()
                 val expectedQuery =
                     "{ \"\$cond\" : " +

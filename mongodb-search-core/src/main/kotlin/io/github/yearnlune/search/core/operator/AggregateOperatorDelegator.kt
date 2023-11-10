@@ -3,6 +3,7 @@ package io.github.yearnlune.search.core.operator
 import io.github.yearnlune.search.core.exception.NotSupportedExpressionException
 import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
 import io.github.yearnlune.search.core.extension.snakeCase
+import io.github.yearnlune.search.core.type.PropertyNamingStrategyType
 import io.github.yearnlune.search.graphql.AggregationAccumulatorOperatorType
 import io.github.yearnlune.search.graphql.AggregationInput
 import io.github.yearnlune.search.graphql.ConditionInput
@@ -18,7 +19,11 @@ class AggregateOperatorDelegator {
 
     private val aggregateOperator: MutableList<AggregateOperator> = mutableListOf()
 
-    fun create(aggregationInput: Any, targetClass: Class<*>): AggregateOperatorDelegator {
+    fun create(
+        aggregationInput: Any,
+        targetClass: Class<*>,
+        propertyNamingStrategy: PropertyNamingStrategyType
+    ): AggregateOperatorDelegator {
         when (aggregationInput) {
             is GroupAggregationInput -> {
                 val addFields = mutableListOf<AddFieldsOperator.Field>()
@@ -56,9 +61,15 @@ class AggregateOperatorDelegator {
                 }
 
                 val groupOperator =
-                    buildExpression(GroupOperator(groupByList), aggregationInput.aggregations, targetClass)
+                    buildExpression(
+                        GroupOperator(groupByList),
+                        aggregationInput.aggregations,
+                        targetClass,
+                        propertyNamingStrategy
+                    )
                 aggregateOperator.add(groupOperator)
             }
+
             is CountAggregationInput -> aggregateOperator.add(CountOperator(aggregationInput.alias))
             is LimitAggregationInput -> aggregateOperator.add(LimitOperator(aggregationInput.maxElements))
             is SortAggregationInput -> aggregateOperator.add(SortOperator(aggregationInput.sorts))
@@ -80,15 +91,19 @@ class AggregateOperatorDelegator {
     private fun buildExpression(
         aggregateOperator: AggregateOperator,
         aggregations: List<AggregationInput>,
-        targetClass: Class<*>
+        targetClass: Class<*>,
+        propertyNamingStrategy: PropertyNamingStrategyType
     ): AggregateOperator {
         aggregations.forEach {
 
             try {
-                val property = it.property?.snakeCase()
+                val property = when (propertyNamingStrategy) {
+                    PropertyNamingStrategyType.SNAKE_CASE -> it.property?.snakeCase()
+                    else -> it.property
+                }
                 var propertyExpression: AggregationExpression? = null
                 if (it.propertyExpression != null) {
-                    propertyExpression = fieldExpression(it.propertyExpression!!)
+                    propertyExpression = fieldExpression(it.propertyExpression!!, propertyNamingStrategy)
                 }
 
                 val expression = when (it.operator) {
@@ -96,6 +111,7 @@ class AggregateOperatorDelegator {
                     AggregationAccumulatorOperatorType.SUM -> SumOperator(property, propertyExpression, it.alias)
                     AggregationAccumulatorOperatorType.AVERAGE ->
                         AverageOperator(property, propertyExpression, it.alias)
+
                     AggregationAccumulatorOperatorType.MAX -> MaxOperator(property, propertyExpression, it.alias)
                     AggregationAccumulatorOperatorType.MIN -> MinOperator(property, propertyExpression, it.alias)
                     else -> throw NotSupportedExpressionException("Not supported expression: ${it.operator.name}")
@@ -110,9 +126,17 @@ class AggregateOperatorDelegator {
         return aggregateOperator
     }
 
-    private fun fieldExpression(expression: Any): AggregationExpression {
+    private fun fieldExpression(
+        expression: Any,
+        propertyNamingStrategy: PropertyNamingStrategyType
+    ): AggregationExpression {
         val operator = when (expression) {
-            is ConditionInput -> ConditionOperator(`if` = expression.`if`, then = expression.then)
+            is ConditionInput -> ConditionOperator(
+                `if` = expression.`if`,
+                then = expression.then,
+                null,
+                propertyNamingStrategy
+            )
             else ->
                 throw NotSupportedExpressionException("Not supported expression: ${expression.javaClass.simpleName}")
         }

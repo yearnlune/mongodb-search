@@ -2,6 +2,7 @@ package io.github.yearnlune.search.core.operator
 
 import io.github.yearnlune.search.core.exception.NotSupportedExpressionException
 import io.github.yearnlune.search.core.extension.toMongoType
+import io.github.yearnlune.search.core.type.PropertyNamingStrategyType
 import io.github.yearnlune.search.graphql.DataInput
 import io.github.yearnlune.search.graphql.SearchInput
 import org.springframework.data.mongodb.core.aggregation.AggregationExpression
@@ -10,12 +11,13 @@ import org.springframework.data.mongodb.core.aggregation.ConditionalOperators
 class ConditionOperator(
     private val `if`: SearchInput,
     private val then: DataInput,
-    private val `else`: String? = null
+    private val `else`: String? = null,
+    private val propertyNamingStrategy: PropertyNamingStrategyType
 ) {
 
     fun buildExpression(): AggregationExpression {
         return ConditionalOperators.Cond.`when`(
-            SearchOperatorDelegator().create(`if`, Any::class.java).buildExpression()
+            SearchOperatorDelegator().create(`if`, Any::class.java, propertyNamingStrategy).buildExpression()
         ).run {
             then.value?.let { this.then(it.toMongoType(then.type!!)) }
                 ?: then.fieldReference?.let { this.thenValueOf(it) }

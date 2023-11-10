@@ -4,6 +4,7 @@ import io.github.yearnlune.search.core.MongoSearch
 import io.github.yearnlune.search.core.domain.Product
 import io.github.yearnlune.search.core.exception.ValidationException
 import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
+import io.github.yearnlune.search.core.type.PropertyNamingStrategyType
 import io.github.yearnlune.search.graphql.AggregationAccumulatorOperatorType
 import io.github.yearnlune.search.graphql.AggregationInput
 import io.github.yearnlune.search.graphql.ConditionInput
@@ -43,7 +44,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                 context("그룹 별 개수를 구할 때") {
                     it("\$group에서 \$count를 사용한다.") {
                         val aggregates = SearchOperatorDelegator()
-                            .create(searchInput, Product::class.java)
+                            .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                             .buildAggregation()
                         val groupAggregation = GroupAggregationInput(
                             by = listOf(GroupByInput(key = "category")),
@@ -70,7 +71,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                 context("특정 필드의 그룹 별 총합을 구할 때") {
                     it("\$group에서 \$sum을 사용한다.") {
                         val aggregates = SearchOperatorDelegator()
-                            .create(searchInput, Product::class.java)
+                            .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                             .buildAggregation()
                         val groupAggregation = GroupAggregationInput(
                             by = listOf(GroupByInput(key = "category")),
@@ -96,7 +97,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         context("필드 지정을 하지 않았을 때") {
                             it("ValidationException을 반환한다.") {
                                 val aggregates = SearchOperatorDelegator()
-                                    .create(searchInput, Product::class.java)
+                                    .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                                     .buildAggregation()
                                 val groupAggregation = GroupAggregationInput(
                                     by = listOf(
@@ -119,7 +120,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         context("필드가 빈 값 일 때") {
                             it("ValidationException을 반환한다.") {
                                 val aggregates = SearchOperatorDelegator()
-                                    .create(searchInput, Product::class.java)
+                                    .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                                     .buildAggregation()
 
                                 val groupAggregation = GroupAggregationInput(
@@ -154,7 +155,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             "{ \"\$sum\" : { \"\$cond\" : { \"if\" : { \"\$eq\" : " +
                             "[\"\$category\", \"fruit\"]}, \"then\" : 1, \"else\" : \"\$nullField\"}}}}}]"
                         val aggregates = SearchOperatorDelegator()
-                            .create(searchInput, Product::class.java)
+                            .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                             .buildAggregation()
 
                         val groupAggregation = GroupAggregationInput(
@@ -198,7 +199,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                 context("그룹 별 평균을 구할 때") {
                     it("\$group에서 \$avg를 사용한다.") {
                         val aggregates = SearchOperatorDelegator()
-                            .create(searchInput, Product::class.java)
+                            .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                             .buildAggregation()
                         val groupAggregation = GroupAggregationInput(
                             by = listOf(
@@ -233,7 +234,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         operator = SearchOperatorType.BETWEEN
                     )
                     val aggregates = SearchOperatorDelegator()
-                        .create(searchInput, Product::class.java)
+                        .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                         .buildAggregation()
                     val groupAggregation = GroupAggregationInput(
                         by = listOf(
@@ -267,7 +268,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         operator = SearchOperatorType.BETWEEN
                     )
                     val aggregates = SearchOperatorDelegator()
-                        .create(searchInput, Product::class.java)
+                        .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                         .buildAggregation()
                     val groupAggregation = GroupAggregationInput(
                         by = listOf(
@@ -309,7 +310,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
                             "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}"
                         val aggregates = SearchOperatorDelegator()
-                            .create(searchInput, Product::class.java)
+                            .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                             .buildAggregation()
                         val groupAggregation = GroupAggregationInput(
                             by = listOf(
@@ -337,7 +338,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
                             "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}"
                         val aggregates = SearchOperatorDelegator()
-                            .create(searchInput, Product::class.java)
+                            .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                             .buildAggregation()
                         val groupAggregation = GroupAggregationInput(
                             by = listOf(
@@ -365,7 +366,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
                             "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}"
                         val aggregates = SearchOperatorDelegator()
-                            .create(searchInput, Product::class.java)
+                            .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                             .buildAggregation()
                         val groupAggregation = GroupAggregationInput(
                             by = listOf(
@@ -393,7 +394,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
                             "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 0]}, \"to\" : \"date\"}}}}}}"
                         val aggregates = SearchOperatorDelegator()
-                            .create(searchInput, Product::class.java)
+                            .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                             .buildAggregation()
                         val groupAggregation = GroupAggregationInput(
                             by = listOf(
@@ -420,7 +421,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         "[{ \"\$convert\" : { \"input\" : { \"\$convert\" : { \"input\" : \"\$updated_at\", " +
                         "\"to\" : \"date\"}}, \"to\" : \"long\"}}, 32400]}, \"to\" : \"date\"}}}}}}"
                     val aggregates = SearchOperatorDelegator()
-                        .create(searchInput, Product::class.java)
+                        .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                         .buildAggregation()
                     val groupAggregation = GroupAggregationInput(
                         by = listOf(
@@ -453,7 +454,7 @@ class QueryExtensionAggregateTest : DescribeSpec({
                         operator = SearchOperatorType.BETWEEN
                     )
                     val aggregates = SearchOperatorDelegator()
-                        .create(searchInput, Product::class.java)
+                        .create(searchInput, Product::class.java, PropertyNamingStrategyType.SNAKE_CASE)
                         .buildAggregation()
                     val groupAggregation = GroupAggregationInput(
                         by = listOf(),
@@ -480,7 +481,8 @@ class QueryExtensionAggregateTest : DescribeSpec({
                             value = listOf("사과", "바나나", "세제"),
                             operator = SearchOperatorType.EQUAL
                         ),
-                        Product::class.java
+                        Product::class.java,
+                        PropertyNamingStrategyType.SNAKE_CASE
                     ).buildAggregation()
                     val groupAggregation = GroupAggregationInput(
                         by = listOf(GroupByInput(key = "deleted", option = GroupByOptionType.EXISTS)),
