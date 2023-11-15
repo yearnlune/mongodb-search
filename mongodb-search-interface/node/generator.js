@@ -16,8 +16,9 @@ definitionsFactory.generate({
   outputAs: 'interface',
   emitTypenameField: true,
   customScalarTypeMapping: {
-    LONG: 'number',
-    JSON: 'any'
+    Long: 'number',
+    JSON: 'any',
+    Property: 'string'
   },
   federation: false,
   enumsAsTypes: true

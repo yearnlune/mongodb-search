@@ -2,6 +2,7 @@ package io.github.yearnlune.search.example.config
 
 import graphql.scalars.ExtendedScalars
 import graphql.schema.idl.RuntimeWiring
+import io.github.yearnlune.search.scalar.MongodbSearchScalars
 import org.springframework.context.annotation.Configuration
 import org.springframework.graphql.execution.RuntimeWiringConfigurer
 
@@ -14,6 +15,7 @@ class GraphqlWiringConfig : RuntimeWiringConfigurer {
             .scalar(ExtendedScalars.DateTime)
             .scalar(ExtendedScalars.Json)
             .scalar(ExtendedScalars.GraphQLLong)
+            .scalar(MongodbSearchScalars.Property)
             .build()
     }
 }
