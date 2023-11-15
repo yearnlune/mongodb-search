@@ -5,11 +5,9 @@ import graphql.schema.CoercingSerializeException
 
 class PropertyCoercing : Coercing<String, String> {
 
-    private val propertyFactory = PropertyFactory
-
     override fun serialize(dataFetcherResult: Any): String {
         return when (dataFetcherResult) {
-            is String -> PropertyFactory.convert(dataFetcherResult)
+            is String -> PropertyFactory.convert(dataFetcherResult, true)
             else -> throw CoercingSerializeException(
                 "Expected a 'String' but was ${dataFetcherResult.javaClass.simpleName}."
             )
