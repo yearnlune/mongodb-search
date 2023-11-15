@@ -1,5 +1,6 @@
 scalar Long
 scalar JSON
+scalar Property
 
 enum SearchOperatorType {
     EQUAL
@@ -97,12 +98,12 @@ input DataInput {
 }
 
 input SortInput {
-    property: String!
+    property: Property!
     isDescending: Boolean! = false
 }
 
 input SearchInput {
-    by: String!
+    by: Property!
     type: PropertyType!
     operator: SearchOperatorType!
     value: [String!]!
@@ -116,7 +117,7 @@ input PageInput {
 }
 
 input AggregationInput {
-    property: String
+    property: Property
     propertyExpression: ConditionInput
     operator: AggregationAccumulatorOperatorType!
     alias: String
@@ -128,7 +129,7 @@ input ConditionInput {
 }
 
 input GroupByInput {
-    key: String!
+    key: Property!
     option: GroupByOptionType @deprecated(reason: "option is deprecated since v1.0.26, Use options instead.")
     options: GroupByOptionInput
 }
@@ -156,7 +157,7 @@ input SortAggregationInput {
 }
 
 input UnwindAggregationInput {
-    by: String
+    by: Property
 }
 
 input StatisticInput {
@@ -216,7 +217,7 @@ type Statistic {
 }
 
 type Search {
-    by: String!
+    by: Property!
     type: PropertyType!
     operator: SearchOperatorType!
     value: [String!]!

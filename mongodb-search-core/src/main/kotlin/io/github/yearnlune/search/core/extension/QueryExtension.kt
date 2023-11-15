@@ -2,7 +2,6 @@ package io.github.yearnlune.search.core.extension
 
 import io.github.yearnlune.search.core.operator.AggregateOperatorDelegator
 import io.github.yearnlune.search.core.operator.SearchOperatorDelegator
-import io.github.yearnlune.search.core.type.PropertyNamingStrategyType
 import io.github.yearnlune.search.graphql.DateUnitType
 import io.github.yearnlune.search.graphql.PageInput
 import io.github.yearnlune.search.graphql.SearchInput
@@ -21,12 +20,11 @@ import java.time.temporal.TemporalUnit
 fun Criteria.search(
     searches: List<SearchInput>,
     targetClass: Class<*>,
-    propertyNamingStrategy: PropertyNamingStrategyType = PropertyNamingStrategyType.SNAKE_CASE
 ): Criteria {
     var newCriteria = this
 
     searches.forEach {
-        newCriteria = SearchOperatorDelegator().create(it, targetClass, propertyNamingStrategy).buildQuery(newCriteria)
+        newCriteria = SearchOperatorDelegator().create(it, targetClass).buildQuery(newCriteria)
     }
 
     return newCriteria
@@ -40,7 +38,6 @@ fun Aggregation.search(searches: List<SearchInput>, targetClass: Class<*>): Aggr
 fun Aggregation.aggregate(
     aggregates: List<Any>,
     targetClass: Class<*>,
-    propertyNamingStrategy: PropertyNamingStrategyType = PropertyNamingStrategyType.SNAKE_CASE
 ): Aggregation {
     val operations = mutableListOf<AggregationOperation>()
     operations.addAll(this.pipeline.operations)
@@ -51,7 +48,6 @@ fun Aggregation.aggregate(
                 .create(
                     if (it is Map<*, *>) it.toAggregationInput() else it,
                     targetClass,
-                    propertyNamingStrategy
                 )
                 .buildAggregate()
         )

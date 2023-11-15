@@ -15,20 +15,6 @@ import org.bson.types.ObjectId
 
 class CommonExtensionTest : DescribeSpec({
 
-    describe("snakeCase") {
-        context("camelcase를 변환할 때") {
-            it("snakecase로 변환한다.") {
-                "camelCase".snakeCase() shouldBe "camel_case"
-            }
-        }
-
-        context("pascalCase를 변환할 때") {
-            it("snakecase로 변환한다.") {
-                "PascalCase".snakeCase() shouldBe "pascal_case"
-            }
-        }
-    }
-
     describe("toMongoType") {
         context("PropertyType.INTEGER") {
             context("값이 integer 일 때") {
