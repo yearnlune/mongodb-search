@@ -1,5 +1,6 @@
 package io.github.yearnlune.search.scalar
 
+import graphql.language.StringValue
 import graphql.schema.Coercing
 import graphql.schema.CoercingSerializeException
 
@@ -25,7 +26,7 @@ class PropertyCoercing : Coercing<String, String> {
 
     override fun parseLiteral(input: Any): String {
         return when (input) {
-            is String -> PropertyFactory.convert(input)
+            is StringValue -> PropertyFactory.convert(input.value)
             else -> throw CoercingSerializeException(
                 "Expected a 'String' but was ${input.javaClass.simpleName}."
             )
