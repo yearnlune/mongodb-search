@@ -11,12 +11,6 @@ import org.bson.types.ObjectId
 import java.util.regex.Pattern
 import kotlin.math.floor
 
-fun String.snakeCase(): String {
-    return "(?<=[a-zA-Z])[A-Z]".toRegex().replace(this) {
-        "_${it.value}"
-    }.lowercase()
-}
-
 @kotlin.jvm.Throws(NumberFormatException::class, IllegalArgumentException::class)
 fun String.toMongoType(type: PropertyType): Any {
     return when (type) {

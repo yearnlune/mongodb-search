@@ -1,9 +1,7 @@
 package io.github.yearnlune.search.core.operator
 
 import io.github.yearnlune.search.core.exception.NotSupportedOperatorException
-import io.github.yearnlune.search.core.extension.snakeCase
 import io.github.yearnlune.search.core.extension.toMongoType
-import io.github.yearnlune.search.core.type.PropertyNamingStrategyType
 import io.github.yearnlune.search.core.type.ReservedWordType
 import io.github.yearnlune.search.graphql.PropertyType
 import io.github.yearnlune.search.graphql.SearchInput
@@ -21,12 +19,8 @@ class SearchOperatorDelegator {
     fun <T> create(
         searchInput: SearchInput,
         targetClass: Class<T>,
-        propertyNamingStrategy: PropertyNamingStrategyType
     ): SearchOperatorDelegator {
-        val searchBy = when (propertyNamingStrategy) {
-            PropertyNamingStrategyType.SNAKE_CASE -> searchInput.by.snakeCase()
-            else -> searchInput.by
-        }
+        val searchBy = searchInput.by
         val typedValues = searchInput.value
             .map { processReservedWord(it, searchInput.type) }
             .map { it.toMongoType(searchInput.type) }

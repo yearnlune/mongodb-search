@@ -76,7 +76,7 @@ class QueryExtensionSearchTest() : DescribeSpec({
             it("objectId 타입일 때") {
                 val start = 1657767559757L
                 val searchInput = SearchInput(
-                    by = "id",
+                    by = "_id",
                     type = PropertyType.OBJECT_ID,
                     value = listOf("$start", "${start + 1000L}"),
                     operator = SearchOperatorType.BETWEEN
@@ -84,7 +84,7 @@ class QueryExtensionSearchTest() : DescribeSpec({
 
                 val criteria = Criteria().search(listOf(searchInput), Product::class.java)
                 SerializationUtils.serializeToJsonSafely(Query(criteria).queryObject) shouldBe
-                    "{ \"id\" : { \"\$gte\" : { \"\$oid\" : \"62cf86870000000000000000\"}, \"\$lt\" : { \"\$oid\" : \"62cf86880000000000000000\"}}}"
+                    "{ \"_id\" : { \"\$gte\" : { \"\$oid\" : \"62cf86870000000000000000\"}, \"\$lt\" : { \"\$oid\" : \"62cf86880000000000000000\"}}}"
             }
 
             it("현재시각으로 검색 할 때") {

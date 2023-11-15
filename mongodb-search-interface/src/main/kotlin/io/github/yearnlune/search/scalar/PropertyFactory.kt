@@ -1,6 +1,7 @@
 package io.github.yearnlune.search.scalar
 
 object PropertyFactory {
+    var namingStrategy: PropertyNamingStrategy = PropertyNamingStrategyOrigin
     private val factory: MutableMap<String, String> = mutableMapOf("id" to "_id")
     private val reverseFactory: MutableMap<String, String> = mutableMapOf("_id" to "id")
 
@@ -21,6 +22,6 @@ object PropertyFactory {
             factory[target] ?: target
         } else {
             reverseFactory[target] ?: target
-        }
+        }.let { namingStrategy.process(it) }
     }
 }

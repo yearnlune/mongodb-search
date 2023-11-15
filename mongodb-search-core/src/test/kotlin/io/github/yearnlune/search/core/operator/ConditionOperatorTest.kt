@@ -1,6 +1,5 @@
 package io.github.yearnlune.search.core.operator
 
-import io.github.yearnlune.search.core.type.PropertyNamingStrategyType
 import io.github.yearnlune.search.graphql.DataInput
 import io.github.yearnlune.search.graphql.PropertyType
 import io.github.yearnlune.search.graphql.SearchInput
@@ -24,14 +23,13 @@ class ConditionOperatorTest : DescribeSpec({
                     search,
                     DataInput(type = PropertyType.STRING, value = "F"),
                     "P",
-                    PropertyNamingStrategyType.SNAKE_CASE
                 ).buildExpression()
                 val expectedQuery =
                     "{ \"\$cond\" : " +
-                        "{ \"if\" : { \"\$and\" : [" +
-                        "{ \"\$gte\" : [\"\$${search.by}\", ${search.value[0]}]}, " +
-                        "{ \"\$lt\" : [\"\$${search.by}\", ${search.value[1]}]}" +
-                        "]}, \"then\" : \"F\", \"else\" : \"P\"}}"
+                            "{ \"if\" : { \"\$and\" : [" +
+                            "{ \"\$gte\" : [\"\$${search.by}\", ${search.value[0]}]}, " +
+                            "{ \"\$lt\" : [\"\$${search.by}\", ${search.value[1]}]}" +
+                            "]}, \"then\" : \"F\", \"else\" : \"P\"}}"
 
                 Aggregation.newAggregation(Aggregation.project().and(conditionExpression).`as`("PASS-FAIL"))
                     .toString() shouldContain expectedQuery
