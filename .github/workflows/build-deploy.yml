@@ -20,15 +20,18 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: java core artifacts
-          path: mongodb-search-core/build
+          path: | 
+            mongodb-search-core/build
       - uses: actions/upload-artifact@v3
         with:
           name: java interface artifacts
-          path: mongodb-search-interface/build
+          path: |
+            mongodb-search-interface/build
       - uses: actions/upload-artifact@v3
         with:
           name: java plugin artifacts
-          path: mongodb-search-gradle-plugin/build
+          path: | 
+            mongodb-search-gradle-plugin/build
   node-build:
     name: Build node
     runs-on: ubuntu-latest
