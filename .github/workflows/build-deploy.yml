@@ -128,7 +128,7 @@ jobs:
         run: echo ::set-output name=tag::$(echo ${GITHUB_REF:11})
       - run: node .ci/set-version ${{ steps.tag.outputs.tag }}
       - name: Publish package
-        run: yarn install --immutable && yarn publish --access=public
+        run: yarn install --immutable && yarn npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   deploy-plugin:
