@@ -53,7 +53,6 @@ jobs:
         with:
           name: node artifacts
           path: mongodb-search-interface/node/dist/
-
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -129,7 +128,7 @@ jobs:
         run: echo ::set-output name=tag::$(echo ${GITHUB_REF:11})
       - run: node .ci/set-version ${{ steps.tag.outputs.tag }}
       - name: Publish package
-        run: yarn publish --access=public
+        run: yarn install --immutable && yarn publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   deploy-plugin:
