@@ -20,18 +20,15 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: java core artifacts
-          path: | 
-            mongodb-search-core/build
+          path: mongodb-search-core/build
       - uses: actions/upload-artifact@v3
         with:
           name: java interface artifacts
-          path: |
-            mongodb-search-interface/build
+          path: mongodb-search-interface/build
       - uses: actions/upload-artifact@v3
         with:
           name: java plugin artifacts
-          path: | 
-            mongodb-search-gradle-plugin/build
+          path: mongodb-search-gradle-plugin/build
   node-build:
     name: Build node
     runs-on: ubuntu-latest
@@ -44,6 +41,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: java interface artifacts
+          path: mongodb-search-interface/build
       - uses: actions/setup-node@v4
         with:
           node-version: 16
@@ -60,9 +58,11 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: java interface artifacts
+          path: mongodb-search-interface/build
       - uses: actions/download-artifact@v3
         with:
           name: java core artifacts
+          path: mongodb-search-core/build
       - uses: actions/setup-java@v3
         with:
           java-version: 11
@@ -115,6 +115,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: java interface artifacts
+          path: mongodb-search-interface/build
       - uses: actions/setup-node@v4
         with:
           node-version: 16
@@ -136,6 +137,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: java plugin artifacts
+          path: mongodb-search-gradle-plugin/build
       - uses: actions/setup-java@v3
         with:
           java-version: 11
