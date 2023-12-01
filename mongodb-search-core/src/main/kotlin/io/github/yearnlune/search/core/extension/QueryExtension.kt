@@ -77,7 +77,7 @@ fun DateUnitType.toTemporalType(): TemporalUnit {
 
 fun PageInput.toPageRequest(): Pageable {
     return PageRequest.of(
-        this.pageNumber.toInt() - 1,
+        this.pageNumber.toInt(),
         this.pageSize.toInt(),
         Sort.by(
             this.sort.map {
