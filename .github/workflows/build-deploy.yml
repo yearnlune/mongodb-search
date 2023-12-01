@@ -19,11 +19,16 @@ jobs:
         run: gradle mongodb-search-core:build mongodb-search-gradle-plugin:build
       - uses: actions/upload-artifact@v3
         with:
-          name: java artifacts
-          path: |
-            mongodb-search-core/build
-            mongodb-search-interface/build
-            mongodb-search-gradle-plugin/build
+          name: java core artifacts
+          path: mongodb-search-core/build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: java interface artifacts
+          path: mongodb-search-interface/build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: java plugin artifacts
+          path: mongodb-search-gradle-plugin/build
   node-build:
     name: Build node
     runs-on: ubuntu-latest
@@ -35,13 +40,15 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: java artifacts
-      - uses: actions/setup-node@v3
+          name: java interface artifacts
+          path: mongodb-search-interface/build
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
+      - run: yarn set version 3.2.0
       - name: Yarn build
-        run: yarn && yarn build
+        run: yarn install --immutable && yarn build
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -50,7 +57,12 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: java artifacts
+          name: java interface artifacts
+          path: mongodb-search-interface/build
+      - uses: actions/download-artifact@v3
+        with:
+          name: java core artifacts
+          path: mongodb-search-core/build
       - uses: actions/setup-java@v3
         with:
           java-version: 11
@@ -69,7 +81,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: java artifacts
+          name: java interface artifacts
+      - uses: actions/download-artifact@v3
+        with:
+          name: java core artifacts
       - uses: actions/setup-java@v3
         with:
           java-version: 11
@@ -99,10 +114,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: java artifacts
-      - uses: actions/setup-node@v3
+          name: java interface artifacts
+          path: mongodb-search-interface/build
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16.x'
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
       - id: tag
         run: echo ::set-output name=tag::$(echo ${GITHUB_REF:11})
@@ -120,7 +136,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: java artifacts
+          name: java plugin artifacts
+          path: mongodb-search-gradle-plugin/build
       - uses: actions/setup-java@v3
         with:
           java-version: 11
