@@ -17,7 +17,7 @@ plugins {
 
 allprojects {
     group = "io.github.yearnlune.search"
-    version = "1.2.2"
+    version = "1.2.3"
 
     repositories {
         mavenCentral()
