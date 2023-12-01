@@ -38,10 +38,10 @@ jobs:
           name: java artifacts
       - uses: actions/setup-node@v3
         with:
-          node-version: '16.9'
+          node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Yarn build
-        run: yarn && yarn build
+        run: yarn install --immutable && yarn build
   test:
     name: Test
     runs-on: ubuntu-latest
