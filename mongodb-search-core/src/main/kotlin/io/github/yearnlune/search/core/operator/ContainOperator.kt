@@ -26,6 +26,6 @@ class ContainOperator(
     }
 
     private fun convertRegex(): String {
-        return values.joinToString("|") { (it as String).escapeSpecialRegexChars() }
+        return values.joinToString("|") { (it.toString()).escapeSpecialRegexChars() }
     }
 }
