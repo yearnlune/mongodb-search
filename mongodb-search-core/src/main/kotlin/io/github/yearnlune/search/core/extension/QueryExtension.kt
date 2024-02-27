@@ -88,16 +88,10 @@ fun PageInput.toPageRequest(): Pageable {
 }
 
 fun PageInput.toSortOperation(): SortOperation? {
-    var sorts: Sort? = null
-    this.sort.map { sortInput ->
+    return this.sort.map { sortInput ->
         val direction = if (sortInput.isDescending) Sort.Direction.DESC else Sort.Direction.ASC
-        val sort = Sort.by(direction, sortInput.property)
-        sorts = if (sorts == null) {
-            sort
-        } else {
-            sort.and(sort)
-        }
+        Sort.by(direction, sortInput.property)
     }
-
-    return sorts?.let { SortOperation(it) }
+        .reduceOrNull { acc, sort -> acc.and(sort) }
+        ?.let { SortOperation(it) }
 }
