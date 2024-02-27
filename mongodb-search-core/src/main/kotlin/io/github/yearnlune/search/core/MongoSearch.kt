@@ -9,11 +9,11 @@ import org.springframework.data.mongodb.core.query.Criteria
 
 object MongoSearch {
 
-    fun search(searches: List<SearchInput>, targetClass: Class<*>): Criteria {
+    fun search(searches: List<SearchInput>, targetClass: Class<*>? = null): Criteria {
         return Criteria().search(searches, targetClass)
     }
 
-    fun statistic(statisticInput: StatisticInput, targetClass: Class<*>): Aggregation {
+    fun statistic(statisticInput: StatisticInput, targetClass: Class<*>? = null): Aggregation {
         return Aggregation.newAggregation(
             Aggregation.match(Criteria().search(statisticInput.searches, targetClass))
         ).aggregate(statisticInput.aggregates, targetClass)

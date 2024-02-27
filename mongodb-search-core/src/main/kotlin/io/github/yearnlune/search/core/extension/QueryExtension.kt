@@ -19,7 +19,7 @@ import java.time.temporal.TemporalUnit
 
 fun Criteria.search(
     searches: List<SearchInput>,
-    targetClass: Class<*>,
+    targetClass: Class<*>? = null,
 ): Criteria {
     var newCriteria = this
 
@@ -37,7 +37,7 @@ fun Aggregation.search(searches: List<SearchInput>, targetClass: Class<*>): Aggr
 
 fun Aggregation.aggregate(
     aggregates: List<Any>,
-    targetClass: Class<*>,
+    targetClass: Class<*>? = null,
 ): Aggregation {
     val operations = mutableListOf<AggregationOperation>()
     operations.addAll(this.pipeline.operations)

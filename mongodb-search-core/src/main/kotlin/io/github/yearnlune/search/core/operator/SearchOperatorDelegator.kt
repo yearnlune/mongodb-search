@@ -18,7 +18,7 @@ class SearchOperatorDelegator {
 
     fun <T> create(
         searchInput: SearchInput,
-        targetClass: Class<T>,
+        targetClass: Class<T>? = null,
     ): SearchOperatorDelegator {
         val searchBy = searchInput.by
         val typedValues = searchInput.value

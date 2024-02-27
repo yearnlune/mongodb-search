@@ -19,7 +19,7 @@ class AggregateOperatorDelegator {
 
     fun create(
         aggregationInput: Any,
-        targetClass: Class<*>,
+        targetClass: Class<*>? = null,
     ): AggregateOperatorDelegator {
         when (aggregationInput) {
             is GroupAggregationInput -> {
@@ -86,7 +86,7 @@ class AggregateOperatorDelegator {
     private fun buildExpression(
         aggregateOperator: AggregateOperator,
         aggregations: List<AggregationInput>,
-        targetClass: Class<*>,
+        targetClass: Class<*>? = null,
     ): AggregateOperator {
         aggregations.forEach {
 
